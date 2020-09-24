@@ -46,7 +46,9 @@ phases:
   pre_build:
     # run-as: Linux-user-name
     commands:
+      - echo "Running composer install"
       - composer install
+      - echo "Running npm install"
       - npm install
     # finally:
     #   - command
@@ -54,6 +56,7 @@ phases:
   build:
     # run-as: Linux-user-name
     commands:
+      - echo "Running npm run prod"
       - npm run prod
     # finally:
     #   - command
@@ -61,40 +64,51 @@ phases:
   post_build:
     # run-as: Linux-user-name
     commands:
+      - echo "Deploying to serverless"
       - serverless deploy
     # finally:
     #   - command
     #   - command
-reports:
-  report-group-name-or-arn:
-    files:
-      - location
-      - location
-    base-directory: location
-    discard-paths: no | yes
-    file-format: report-format
-artifacts:
-  files:
-    - location
-    - location
-  name: artifact-name
-  discard-paths: no | yes
-  base-directory: location
-  secondary-artifacts:
-    artifactIdentifier:
-      files:
-        - location
-        - location
-      name: secondary-artifact-name
-      discard-paths: no | yes
-      base-directory: location
-    artifactIdentifier:
-      files:
-        - location
-        - location
-      discard-paths: no | yes
-      base-directory: location
-cache:
-  paths:
-    - path
-    - path
+
+# reports:
+#   report-group-name-or-arn:
+#     files:
+#       - location
+#       - location
+#     base-directory: location
+#     discard-paths: no | yes
+#     file-format: report-format
+
+## Optional sequence. Represents information about where CodeBuild can find the build output
+## and how CodeBuild prepares it for uploading to the S3 output bucket. This sequence is not
+## required if, for example, you are building and pushing a Docker image to Amazon ECR, or
+## you are running unit tests on your source code, but not building it.
+# artifacts:
+#   files:
+#     - location
+#     - location
+#   name: artifact-name
+#   discard-paths: no | yes
+#   base-directory: location
+#   secondary-artifacts:
+#     artifactIdentifier:
+#       files:
+#         - location
+#         - location
+#       name: secondary-artifact-name
+#       discard-paths: no | yes
+#       base-directory: location
+#     artifactIdentifier:
+#       files:
+#         - location
+#         - location
+#       discard-paths: no | yes
+#       base-directory: location
+
+## Optional sequence. Represents information about where CodeBuild can prepare the files
+## for uploading cache to an S3 cache bucket. This sequence is not required if the cache
+## type of the project is No Cache.
+# cache:
+#   paths:
+#     - path
+#     - path
