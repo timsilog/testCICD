@@ -34,13 +34,14 @@ version: 0.2
 #   build-graph:
         
 phases:
-  # install:
+  install:
   #   run-as: Linux-user-name
   #   runtime-versions:
   #     runtime: version
   #     runtime: version
-  #   commands:
-  #     - command
+    commands:
+      - echo "Installing serverless"
+      - npm i -g serverless
   #   finally:
   #     - command
   pre_build:
