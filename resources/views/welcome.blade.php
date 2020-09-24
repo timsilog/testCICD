@@ -84,6 +84,7 @@
                     Laravel
                 </div>
                 <h1>here is some text</h1>
+                <h2>here is some more text</h2>
                 <div class="links">
                     <a href="https://laravel.com/docs">Docs</a>
                     <a href="https://laracasts.com">Laracasts</a>
