@@ -40,16 +40,13 @@ phases:
   #     runtime: version
   #     runtime: version
     commands:
-      - echo "Installing serverless"
       - npm i -g serverless
   #   finally:
   #     - command
   pre_build:
     # run-as: Linux-user-name
     commands:
-      - echo "Running composer install"
       - composer install
-      - echo "Running npm install"
       - npm install
     # finally:
     #   - command
@@ -57,7 +54,6 @@ phases:
   build:
     # run-as: Linux-user-name
     commands:
-      - echo "Running npm run prod"
       - npm run prod
     # finally:
     #   - command
@@ -65,7 +61,6 @@ phases:
   post_build:
     # run-as: Linux-user-name
     commands:
-      - echo "Deploying to serverless"
       - serverless deploy
     # finally:
     #   - command
