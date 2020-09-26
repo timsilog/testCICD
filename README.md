@@ -9,11 +9,11 @@ Automate the deployment of your Laravel app from a Github push all the way to th
 
 <div id='part1'/>
 
-# Getting Laravel on AWS Lambda
+## Getting Laravel on AWS Lambda
 
 We will use [Bref](https://bref.sh/) with the composer package [laravel-bridge](https://github.com/brefphp/laravel-bridge) as suggested in Bref's [docs](https://bref.sh/docs/frameworks/laravel.html).
 
-## Installation
+### Installation
 
 Visit the root directory of your laravel app and run the following:
 
@@ -25,7 +25,7 @@ Then run the following command to generate a `serverless.yml` file. The laravel-
 
 *Note: laravel-bridge might have some compatibility issues with older versions of laravel regarding illuminate/support and illuminate/queue. I used laravel 7, though a [pull request](https://github.com/brefphp/laravel-bridge/pull/13) was recently merged to support laravel 8.*
 
-## Deployment
+### Deployment
 
 Clear caches then deploy!
 
@@ -69,7 +69,7 @@ More information regarding this process is detailed [here](https://bref.sh/docs/
 
 <div id='part2'/>
 
-# Building/Deploying with AWS Codebuild
+## Building/Deploying with AWS Codebuild
 
 Login to [AWS Codebuild](https://aws.amazon.com/codebuild/) and visit the console. To get started, click "Create Build Project".
 
