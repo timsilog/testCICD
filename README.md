@@ -1,61 +1,90 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+# Setting up a Serverless CI/CD on AWS for Laravel
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/d/total.svg" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/v/stable.svg" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
-</p>
+Automate the deployment of your Laravel app from a Github push all the way to the serverless cloud!
 
-## About Laravel
+## Table of Contents
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+1. [Getting Laravel on AWS Lambda](#part1)
+2. [Building/Deploying with AWS Codebuild](#part2)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+<div id='part1'/>
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+# Getting Laravel on AWS Lambda
 
-## Learning Laravel
+We will use [Bref](https://bref.sh/) with the composer package [laravel-bridge](https://github.com/brefphp/laravel-bridge) as suggested in Bref's [docs](https://bref.sh/docs/frameworks/laravel.html).
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Installation
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Visit the root directory of your laravel app and run the following:
 
-## Laravel Sponsors
+`composer require bref/bref bref/laravel-bridge`
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+Then run the following command to generate a `serverless.yml` file. The laravel-bridge package will preconfigure it for us to deploy our app easily!
 
-### Premium Partners
+`php artisan vendor:publish --tag=serverless-config`
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[OP.GG](https://op.gg)**
+*Note: laravel-bridge might have some compatibility issues with older versions of laravel regarding illuminate/support and illuminate/queue. I used laravel 7, though a [pull request](https://github.com/brefphp/laravel-bridge/pull/13) was recently merged to support laravel 8.*
 
-## Contributing
+## Deployment
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Clear caches then deploy!
 
-## Code of Conduct
+`php artisan config:clear`
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+`serverless deploy`
 
-## Security Vulnerabilities
+The end result should look something like this:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```
+Serverless: Packaging service...
+Serverless: Excluding development dependencies...
+Serverless: Uploading CloudFormation file to S3...
+Serverless: Uploading artifacts...
+Serverless: Uploading service laravel.zip file to S3 (16.04 MB)...
+Serverless: Validating template...
+Serverless: Updating Stack...
+Serverless: Checking Stack update progress...
+....................
+Serverless: Stack update finished...
+Service Information
+service: laravel
+stage: dev
+region: us-east-1
+stack: laravel-dev
+resources: 15
+api keys:
+  None
+endpoints:
+  ANY - https://nqh0z4t3v2.execute-api.us-east-1.amazonaws.com/dev
+  ANY - https://nqh0z4t3v2.execute-api.us-east-1.amazonaws.com/dev/{proxy+}
+functions:
+  web: laravel-dev-web
+  artisan: laravel-dev-artisan
+layers:
+  None
+Serverless: Removing old service artifacts from S3...
+```
 
-## License
+More information regarding this process is detailed [here](https://bref.sh/docs/frameworks/laravel.html).
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+<div id='part2'/>
+
+# Building/Deploying with AWS Codebuild
+
+Login to [AWS Codebuild](https://aws.amazon.com/codebuild/) and visit the console. To get started, click "Create Build Project".
+
+<img src="tims_screenshots/1.png" width="300">
+
+You will see the following fields:
+
+- **Project Configuration**: Enter a project name/description
+- **Source**: Link the github repo here. Multiple sources may be added.
+- **Environment**:
+    - *Operating system*: I used Amazon Linux 2
+    - *Service Role*: You will want to use the same role across all builds. If you have not created one yet you can auto-generate one here. The role will need all of the proper permissions to perform the build. More on that later.
+    - *Additional Configuration*: Add VPC, EFS, and env variables here
+- **Buildspec**: Use a buildspec file. Since we will use multiple buildspec files I suggest giving it a unique name and supplying that name here.
+- **Artifacts**: 
+- **Logs**: Optional if you want to use Cloudwatch
+
+

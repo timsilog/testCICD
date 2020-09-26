@@ -54,14 +54,27 @@ phases:
   build:
     # run-as: Linux-user-name
     commands:
-      - npm run prod
+      - npm run prod      
     # finally:
     #   - command
     #   - command
   post_build:
     # run-as: Linux-user-name
     commands:
-      - serverless deploy
+      # run unit tests
+
+      # aws sync <- read about this
+      # push assets to s3
+      # efs stuff (figure out symlink stuff)
+
+
+      # deploy this to /dev
+      - php artisan cache:clear
+      - serverless deploy # ignore public/assets and vendor
+      # run integration tests
+
+      # deploy to prod
+
     # finally:
     #   - command
     #   - command
@@ -79,9 +92,9 @@ phases:
 ## and how CodeBuild prepares it for uploading to the S3 output bucket. This sequence is not
 ## required if, for example, you are building and pushing a Docker image to Amazon ECR, or
 ## you are running unit tests on your source code, but not building it.
-# artifacts:
-#   files:
-#     - location
+artifacts:
+  files:
+    - '**/*'
 #     - location
 #   name: artifact-name
 #   discard-paths: no | yes

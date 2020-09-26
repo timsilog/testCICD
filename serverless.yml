@@ -11,8 +11,10 @@ provider:
 package:
     # Directories to exclude from deployment
     exclude:
-        # possibly vendor
+        - tims_screenshots
+        - vendor
         - node_modules/**
+        - public/assets
         - public/storage
         - resources/assets/**
         - storage/**
