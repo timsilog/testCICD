@@ -23,7 +23,7 @@ Then run the following command to generate a `serverless.yml` file. The laravel-
 
 `php artisan vendor:publish --tag=serverless-config`
 
-*Note: laravel-bridge might have some compatibility issues with older versions of laravel regarding illuminate/support and illuminate/queue. I used laravel 7, though a [pull request](https://github.com/brefphp/laravel-bridge/pull/13) was recently merged to support laravel 8.*
+*Note: laravel-bridge might have some compatibility issues with older versions of laravel regarding illuminate/support and illuminate/queue. I used laravel 7, though a [pull request](https://github.com/brefphp/laravel-bridge/pull/13) was recently merged to support laravel 8. Additionally using version ^3.0 of laravel/ui for react also does not work. I used laravel/ui:^2.4*
 
 ### Deployment
 

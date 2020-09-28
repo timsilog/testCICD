@@ -86,7 +86,7 @@
                 <h1>here is some text</h1>
                 <h2>here is some more text</h2>
                 <h3>omg even more text</h3>
-                <h1>Hello World Hello World</h1>
+                <div id='example'></div>
                 <div class="links">
                     <a href="https://laravel.com/docs">Docs</a>
                     <a href="https://laracasts.com">Laracasts</a>
@@ -99,5 +99,6 @@
                 </div>
             </div>
         </div>
+        <script src="{{ asset('js/app.js') }}"></script>
     </body>
 </html>
