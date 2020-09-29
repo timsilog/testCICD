@@ -85,7 +85,7 @@
                 </div>
                 <h1>here is some text</h1>
                 <h2>here is some more text</h2>
-                <h3>omg even more text</h3>
+                <h3>omg even more text!</h3>
                 <div id='example'></div>
             </div>
         </div>
