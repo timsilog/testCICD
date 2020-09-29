@@ -87,4 +87,51 @@ You will see the following fields:
 - **Artifacts**: 
 - **Logs**: Optional if you want to use Cloudwatch
 
+## S3 stuff
 
+### Create a bucket
+
+`aws s3api create-bucket --bucket BUCKET_NAME --region us-east-1`
+
+*Note: BUCKET_NAME must be unique*
+
+Check if bucket exists:
+
+`aws s3api head-bucket --bucket BUCKET_NAME`
+
+Returns 200 with nothing if it exists. If it doesn't exist, it returns:
+
+```An error occurred (404) when calling the HeadBucket operation: Not Found```
+
+### Bucket Policy
+
+Get policy:
+
+`aws s3api get-bucket-policy --bucket BUCKET_NAME`
+
+Put policy:
+
+`aws s3api put-bucket-policy --bucket BUCKET_NAME --policy file://policy-filename.json`
+
+Sample basic bucket `policy.json`:
+
+```
+{
+    "Statement": [
+        {
+          "Action": [
+            "s3:DeleteObject",
+            "s3:GetObject",
+            "s3:PutObject"
+          ],
+          "Effect": "Allow",
+          "Resource": "arn:aws:s3:::BUCKET_NAME/*",
+          "Principal": "*"
+        }
+    ]
+}
+```
+
+[More Bucket Policy Examples](https://docs.aws.amazon.com/AmazonS3/latest/dev/example-bucket-policies.html)
+
+[More simple s3 cli commands](https://docs.aws.amazon.com/cli/latest/userguide/cli-services-s3-commands.html)

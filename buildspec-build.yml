@@ -63,8 +63,7 @@ phases:
     commands:
       # run unit tests
 
-      # aws sync <- read about this
-      # push assets to s3
+      - aws s3 sync public/assets s3://$BUCKET_NAME
       # efs stuff (figure out symlink stuff)
 
 

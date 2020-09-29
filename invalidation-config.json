@@ -1,0 +1,9 @@
+{
+    "Paths": {
+        "Quantity": 1,
+        "Items": [
+            "/js/app.js"
+        ]
+    },
+    "CallerReference": "reset app.js"
+}

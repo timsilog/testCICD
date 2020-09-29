@@ -99,6 +99,6 @@
                 </div>
             </div>
         </div>
-        <script src="{{ asset('js/app.js') }}"></script>
+        <script src="http://{{ Storage::disk('s3')->url('js/app.js') }}"></script>
     </body>
 </html>
