@@ -63,7 +63,7 @@ phases:
     commands:
       # run unit tests
 
-      - aws s3 sync public/assets s3://$BUCKET_NAME
+      - aws s3 sync public/assets s3://joset-bucket
       # efs stuff (figure out symlink stuff)
 
 
