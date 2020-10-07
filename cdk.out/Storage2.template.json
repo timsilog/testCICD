@@ -1,0 +1,479 @@
+{
+  "Resources": {
+    "WordpressEFSDBDB4AAE": {
+      "Type": "AWS::EFS::FileSystem",
+      "Properties": {
+        "Encrypted": true,
+        "FileSystemTags": [
+          {
+            "Key": "Name",
+            "Value": "Storage2/Wordpress_EFS"
+          }
+        ],
+        "PerformanceMode": "generalPurpose",
+        "ThroughputMode": "bursting"
+      },
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Retain",
+      "Metadata": {
+        "aws:cdk:path": "Storage2/Wordpress_EFS/Resource"
+      }
+    },
+    "WordpressEFSEfsSecurityGroup34FBE5C3": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Storage2/Wordpress_EFS/EfsSecurityGroup",
+        "SecurityGroupEgress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow all outbound traffic by default",
+            "IpProtocol": "-1"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Storage2/Wordpress_EFS"
+          }
+        ],
+        "VpcId": {
+          "Fn::ImportValue": "VPC:ExportsOutputRefCustomVPC616E3387378F0964"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Storage2/Wordpress_EFS/EfsSecurityGroup/Resource"
+      }
+    },
+    "WordpressEFSEfsSecurityGroupfromIamCommonefssecuritygroup05CCF9F520499BFE38E4": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "IpProtocol": "tcp",
+        "Description": "from IamCommonefssecuritygroup05CCF9F5:2049",
+        "FromPort": 2049,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "WordpressEFSEfsSecurityGroup34FBE5C3",
+            "GroupId"
+          ]
+        },
+        "SourceSecurityGroupId": {
+          "Fn::ImportValue": "IamCommon:ExportsOutputFnGetAttefssecuritygroup5B03FC4EGroupId967354AA"
+        },
+        "ToPort": 2049
+      },
+      "Metadata": {
+        "aws:cdk:path": "Storage2/Wordpress_EFS/EfsSecurityGroup/from IamCommonefssecuritygroup05CCF9F5:2049"
+      }
+    },
+    "WordpressEFSEfsSecurityGroupIamCommonefssecuritygroup05CCF9F52049fromCBE26929": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Fn::ImportValue": "IamCommon:ExportsOutputFnGetAttefssecuritygroup5B03FC4EGroupId967354AA"
+        },
+        "IpProtocol": "tcp",
+        "Description": "to Storage2WordpressEFSEfsSecurityGroup2480AC2B:2049",
+        "DestinationSecurityGroupId": {
+          "Fn::GetAtt": [
+            "WordpressEFSEfsSecurityGroup34FBE5C3",
+            "GroupId"
+          ]
+        },
+        "FromPort": 2049,
+        "ToPort": 2049
+      },
+      "Metadata": {
+        "aws:cdk:path": "Storage2/Wordpress_EFS/EfsSecurityGroup/IamCommonefssecuritygroup05CCF9F5:2049 from"
+      }
+    },
+    "WordpressEFSEfsSecurityGroupfromDatabaserdssecuritygroup237E78012049F5706FC9": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "IpProtocol": "tcp",
+        "Description": "from Databaserdssecuritygroup237E7801:2049",
+        "FromPort": 2049,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "WordpressEFSEfsSecurityGroup34FBE5C3",
+            "GroupId"
+          ]
+        },
+        "SourceSecurityGroupId": {
+          "Fn::ImportValue": "Database:ExportsOutputFnGetAttrdssecuritygroupFB88BAE5GroupId90A39632"
+        },
+        "ToPort": 2049
+      },
+      "Metadata": {
+        "aws:cdk:path": "Storage2/Wordpress_EFS/EfsSecurityGroup/from Databaserdssecuritygroup237E7801:2049"
+      }
+    },
+    "WordpressEFSEfsSecurityGroupDatabaserdssecuritygroup237E78012049from0E220FE9": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Fn::ImportValue": "Database:ExportsOutputFnGetAttrdssecuritygroupFB88BAE5GroupId90A39632"
+        },
+        "IpProtocol": "tcp",
+        "Description": "to Storage2WordpressEFSEfsSecurityGroup2480AC2B:2049",
+        "DestinationSecurityGroupId": {
+          "Fn::GetAtt": [
+            "WordpressEFSEfsSecurityGroup34FBE5C3",
+            "GroupId"
+          ]
+        },
+        "FromPort": 2049,
+        "ToPort": 2049
+      },
+      "Metadata": {
+        "aws:cdk:path": "Storage2/Wordpress_EFS/EfsSecurityGroup/Databaserdssecuritygroup237E7801:2049 from"
+      }
+    },
+    "WordpressEFSEfsMountTarget1ECBACE2C": {
+      "Type": "AWS::EFS::MountTarget",
+      "Properties": {
+        "FileSystemId": {
+          "Ref": "WordpressEFSDBDB4AAE"
+        },
+        "SecurityGroups": [
+          {
+            "Fn::GetAtt": [
+              "WordpressEFSEfsSecurityGroup34FBE5C3",
+              "GroupId"
+            ]
+          }
+        ],
+        "SubnetId": {
+          "Fn::ImportValue": "VPC:ExportsOutputRefCustomVPCprivateSubnetSubnet1Subnet6940697DA44C7CEE"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Storage2/Wordpress_EFS/EfsMountTarget1"
+      }
+    },
+    "WordpressEFSEfsMountTarget2FA7DDC47": {
+      "Type": "AWS::EFS::MountTarget",
+      "Properties": {
+        "FileSystemId": {
+          "Ref": "WordpressEFSDBDB4AAE"
+        },
+        "SecurityGroups": [
+          {
+            "Fn::GetAtt": [
+              "WordpressEFSEfsSecurityGroup34FBE5C3",
+              "GroupId"
+            ]
+          }
+        ],
+        "SubnetId": {
+          "Fn::ImportValue": "VPC:ExportsOutputRefCustomVPCprivateSubnetSubnet2Subnet4D44975F0C746531"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Storage2/Wordpress_EFS/EfsMountTarget2"
+      }
+    },
+    "WordpressEFSAccessPoint0BAB0662": {
+      "Type": "AWS::EFS::AccessPoint",
+      "Properties": {
+        "FileSystemId": {
+          "Ref": "WordpressEFSDBDB4AAE"
+        },
+        "PosixUser": {
+          "Gid": "1001",
+          "Uid": "1001"
+        },
+        "RootDirectory": {
+          "CreationInfo": {
+            "OwnerGid": "1001",
+            "OwnerUid": "1001",
+            "Permissions": "750"
+          },
+          "Path": "/"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Storage2/Wordpress_EFS/AccessPoint/Resource"
+      }
+    },
+    "WordpressS3523C628C": {
+      "Type": "AWS::S3::Bucket",
+      "UpdateReplacePolicy": "Delete",
+      "DeletionPolicy": "Delete",
+      "Metadata": {
+        "aws:cdk:path": "Storage2/Wordpress_S3/Resource"
+      }
+    },
+    "WordpressS3PolicyD82061D8": {
+      "Type": "AWS::S3::BucketPolicy",
+      "Properties": {
+        "Bucket": {
+          "Ref": "WordpressS3523C628C"
+        },
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "s3:GetObject*",
+                "s3:GetBucket*",
+                "s3:List*"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "CanonicalUser": {
+                  "Fn::ImportValue": "IamCommon:ExportsOutputFnGetAttOAIE1EFC67FS3CanonicalUserId143C2ABE"
+                }
+              },
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "WordpressS3523C628C",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "WordpressS3523C628C",
+                          "Arn"
+                        ]
+                      },
+                      "/*"
+                    ]
+                  ]
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Storage2/Wordpress_S3/Policy/Resource"
+      }
+    },
+    "CDKMetadata": {
+      "Type": "AWS::CDK::Metadata",
+      "Properties": {
+        "Modules": "aws-cdk=1.65.0,@aws-cdk/assets=1.65.0,@aws-cdk/aws-apigateway=1.65.0,@aws-cdk/aws-applicationautoscaling=1.65.0,@aws-cdk/aws-autoscaling=1.65.0,@aws-cdk/aws-autoscaling-common=1.65.0,@aws-cdk/aws-autoscaling-hooktargets=1.65.0,@aws-cdk/aws-certificatemanager=1.65.0,@aws-cdk/aws-cloudformation=1.65.0,@aws-cdk/aws-cloudfront=1.65.0,@aws-cdk/aws-cloudwatch=1.65.0,@aws-cdk/aws-codebuild=1.65.0,@aws-cdk/aws-codedeploy=1.65.0,@aws-cdk/aws-codeguruprofiler=1.65.0,@aws-cdk/aws-codepipeline=1.65.0,@aws-cdk/aws-codepipeline-actions=1.65.0,@aws-cdk/aws-ec2=1.65.0,@aws-cdk/aws-ecr=1.65.0,@aws-cdk/aws-ecr-assets=1.65.0,@aws-cdk/aws-ecs=1.65.0,@aws-cdk/aws-efs=1.65.0,@aws-cdk/aws-elasticloadbalancingv2=1.65.0,@aws-cdk/aws-events=1.65.0,@aws-cdk/aws-events-targets=1.65.0,@aws-cdk/aws-iam=1.65.0,@aws-cdk/aws-kms=1.65.0,@aws-cdk/aws-lambda=1.65.0,@aws-cdk/aws-logs=1.65.0,@aws-cdk/aws-rds=1.65.0,@aws-cdk/aws-s3=1.65.0,@aws-cdk/aws-s3-assets=1.65.0,@aws-cdk/aws-sam=1.65.0,@aws-cdk/aws-secretsmanager=1.65.0,@aws-cdk/aws-servicediscovery=1.65.0,@aws-cdk/aws-sns=1.65.0,@aws-cdk/aws-sns-subscriptions=1.65.0,@aws-cdk/aws-sqs=1.65.0,@aws-cdk/aws-ssm=1.65.0,@aws-cdk/cloud-assembly-schema=1.65.0,@aws-cdk/core=1.65.0,@aws-cdk/custom-resources=1.65.0,@aws-cdk/cx-api=1.65.0,@aws-cdk/region-info=1.65.0,jsii-runtime=node.js/v14.8.0"
+      },
+      "Metadata": {
+        "aws:cdk:path": "Storage2/CDKMetadata/Default"
+      },
+      "Condition": "CDKMetadataAvailable"
+    }
+  },
+  "Conditions": {
+    "CDKMetadataAvailable": {
+      "Fn::Or": [
+        {
+          "Fn::Or": [
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-east-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-northeast-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-northeast-2"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-south-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-southeast-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-southeast-2"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ca-central-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "cn-north-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "cn-northwest-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-central-1"
+              ]
+            }
+          ]
+        },
+        {
+          "Fn::Or": [
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-north-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-west-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-west-2"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-west-3"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "me-south-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "sa-east-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "us-east-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "us-east-2"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "us-west-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "us-west-2"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "Outputs": {
+    "ExportsOutputRefWordpressEFSAccessPoint0BAB0662B0F131DF": {
+      "Value": {
+        "Ref": "WordpressEFSAccessPoint0BAB0662"
+      },
+      "Export": {
+        "Name": "Storage2:ExportsOutputRefWordpressEFSAccessPoint0BAB0662B0F131DF"
+      }
+    },
+    "ExportsOutputRefWordpressEFSDBDB4AAEFE31A04A": {
+      "Value": {
+        "Ref": "WordpressEFSDBDB4AAE"
+      },
+      "Export": {
+        "Name": "Storage2:ExportsOutputRefWordpressEFSDBDB4AAEFE31A04A"
+      }
+    },
+    "ExportsOutputFnGetAttWordpressS3523C628CRegionalDomainNameFF6EA16D": {
+      "Value": {
+        "Fn::GetAtt": [
+          "WordpressS3523C628C",
+          "RegionalDomainName"
+        ]
+      },
+      "Export": {
+        "Name": "Storage2:ExportsOutputFnGetAttWordpressS3523C628CRegionalDomainNameFF6EA16D"
+      }
+    },
+    "ExportsOutputRefWordpressS3523C628C295C27F7": {
+      "Value": {
+        "Ref": "WordpressS3523C628C"
+      },
+      "Export": {
+        "Name": "Storage2:ExportsOutputRefWordpressS3523C628C295C27F7"
+      }
+    }
+  }
+}

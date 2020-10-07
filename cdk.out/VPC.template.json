@@ -1,0 +1,659 @@
+{
+  "Resources": {
+    "CustomVPC616E3387": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": "10.0.0.0/16",
+        "EnableDnsHostnames": true,
+        "EnableDnsSupport": true,
+        "InstanceTenancy": "default",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "VPC/CustomVPC"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "VPC/CustomVPC/Resource"
+      }
+    },
+    "CustomVPCpublicSubnetSubnet1SubnetA78537E2": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "10.0.0.0/26",
+        "VpcId": {
+          "Ref": "CustomVPC616E3387"
+        },
+        "AvailabilityZone": {
+          "Fn::Select": [
+            0,
+            {
+              "Fn::GetAZs": ""
+            }
+          ]
+        },
+        "MapPublicIpOnLaunch": true,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "publicSubnet"
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Public"
+          },
+          {
+            "Key": "Name",
+            "Value": "VPC/CustomVPC/publicSubnetSubnet1"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "VPC/CustomVPC/publicSubnetSubnet1/Subnet"
+      }
+    },
+    "CustomVPCpublicSubnetSubnet1RouteTable86B056A0": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "CustomVPC616E3387"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "VPC/CustomVPC/publicSubnetSubnet1"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "VPC/CustomVPC/publicSubnetSubnet1/RouteTable"
+      }
+    },
+    "CustomVPCpublicSubnetSubnet1RouteTableAssociation8087F6C8": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "CustomVPCpublicSubnetSubnet1RouteTable86B056A0"
+        },
+        "SubnetId": {
+          "Ref": "CustomVPCpublicSubnetSubnet1SubnetA78537E2"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "VPC/CustomVPC/publicSubnetSubnet1/RouteTableAssociation"
+      }
+    },
+    "CustomVPCpublicSubnetSubnet1DefaultRoute0DA16FC6": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "CustomVPCpublicSubnetSubnet1RouteTable86B056A0"
+        },
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": {
+          "Ref": "CustomVPCIGWCB65EB6B"
+        }
+      },
+      "DependsOn": [
+        "CustomVPCVPCGW9371D645"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "VPC/CustomVPC/publicSubnetSubnet1/DefaultRoute"
+      }
+    },
+    "CustomVPCpublicSubnetSubnet1EIPE84D4E1E": {
+      "Type": "AWS::EC2::EIP",
+      "Properties": {
+        "Domain": "vpc",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "VPC/CustomVPC/publicSubnetSubnet1"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "VPC/CustomVPC/publicSubnetSubnet1/EIP"
+      }
+    },
+    "CustomVPCpublicSubnetSubnet1NATGatewayDDE2B218": {
+      "Type": "AWS::EC2::NatGateway",
+      "Properties": {
+        "AllocationId": {
+          "Fn::GetAtt": [
+            "CustomVPCpublicSubnetSubnet1EIPE84D4E1E",
+            "AllocationId"
+          ]
+        },
+        "SubnetId": {
+          "Ref": "CustomVPCpublicSubnetSubnet1SubnetA78537E2"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "VPC/CustomVPC/publicSubnetSubnet1"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "VPC/CustomVPC/publicSubnetSubnet1/NATGateway"
+      }
+    },
+    "CustomVPCpublicSubnetSubnet2SubnetD74F3E5F": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "10.0.0.64/26",
+        "VpcId": {
+          "Ref": "CustomVPC616E3387"
+        },
+        "AvailabilityZone": {
+          "Fn::Select": [
+            1,
+            {
+              "Fn::GetAZs": ""
+            }
+          ]
+        },
+        "MapPublicIpOnLaunch": true,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "publicSubnet"
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Public"
+          },
+          {
+            "Key": "Name",
+            "Value": "VPC/CustomVPC/publicSubnetSubnet2"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "VPC/CustomVPC/publicSubnetSubnet2/Subnet"
+      }
+    },
+    "CustomVPCpublicSubnetSubnet2RouteTable8E63F66E": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "CustomVPC616E3387"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "VPC/CustomVPC/publicSubnetSubnet2"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "VPC/CustomVPC/publicSubnetSubnet2/RouteTable"
+      }
+    },
+    "CustomVPCpublicSubnetSubnet2RouteTableAssociationC02C66B6": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "CustomVPCpublicSubnetSubnet2RouteTable8E63F66E"
+        },
+        "SubnetId": {
+          "Ref": "CustomVPCpublicSubnetSubnet2SubnetD74F3E5F"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "VPC/CustomVPC/publicSubnetSubnet2/RouteTableAssociation"
+      }
+    },
+    "CustomVPCpublicSubnetSubnet2DefaultRouteAB70816D": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "CustomVPCpublicSubnetSubnet2RouteTable8E63F66E"
+        },
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": {
+          "Ref": "CustomVPCIGWCB65EB6B"
+        }
+      },
+      "DependsOn": [
+        "CustomVPCVPCGW9371D645"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "VPC/CustomVPC/publicSubnetSubnet2/DefaultRoute"
+      }
+    },
+    "CustomVPCprivateSubnetSubnet1Subnet6940697D": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "10.0.0.128/26",
+        "VpcId": {
+          "Ref": "CustomVPC616E3387"
+        },
+        "AvailabilityZone": {
+          "Fn::Select": [
+            0,
+            {
+              "Fn::GetAZs": ""
+            }
+          ]
+        },
+        "MapPublicIpOnLaunch": false,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "privateSubnet"
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Private"
+          },
+          {
+            "Key": "Name",
+            "Value": "VPC/CustomVPC/privateSubnetSubnet1"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "VPC/CustomVPC/privateSubnetSubnet1/Subnet"
+      }
+    },
+    "CustomVPCprivateSubnetSubnet1RouteTableF6E14B89": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "CustomVPC616E3387"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "VPC/CustomVPC/privateSubnetSubnet1"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "VPC/CustomVPC/privateSubnetSubnet1/RouteTable"
+      }
+    },
+    "CustomVPCprivateSubnetSubnet1RouteTableAssociation6184C3B8": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "CustomVPCprivateSubnetSubnet1RouteTableF6E14B89"
+        },
+        "SubnetId": {
+          "Ref": "CustomVPCprivateSubnetSubnet1Subnet6940697D"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "VPC/CustomVPC/privateSubnetSubnet1/RouteTableAssociation"
+      }
+    },
+    "CustomVPCprivateSubnetSubnet1DefaultRouteBACA7BCB": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "CustomVPCprivateSubnetSubnet1RouteTableF6E14B89"
+        },
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "NatGatewayId": {
+          "Ref": "CustomVPCpublicSubnetSubnet1NATGatewayDDE2B218"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "VPC/CustomVPC/privateSubnetSubnet1/DefaultRoute"
+      }
+    },
+    "CustomVPCprivateSubnetSubnet2Subnet4D44975F": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "10.0.0.192/26",
+        "VpcId": {
+          "Ref": "CustomVPC616E3387"
+        },
+        "AvailabilityZone": {
+          "Fn::Select": [
+            1,
+            {
+              "Fn::GetAZs": ""
+            }
+          ]
+        },
+        "MapPublicIpOnLaunch": false,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "privateSubnet"
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Private"
+          },
+          {
+            "Key": "Name",
+            "Value": "VPC/CustomVPC/privateSubnetSubnet2"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "VPC/CustomVPC/privateSubnetSubnet2/Subnet"
+      }
+    },
+    "CustomVPCprivateSubnetSubnet2RouteTable02C5A89E": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "CustomVPC616E3387"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "VPC/CustomVPC/privateSubnetSubnet2"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "VPC/CustomVPC/privateSubnetSubnet2/RouteTable"
+      }
+    },
+    "CustomVPCprivateSubnetSubnet2RouteTableAssociationAF3376BC": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "CustomVPCprivateSubnetSubnet2RouteTable02C5A89E"
+        },
+        "SubnetId": {
+          "Ref": "CustomVPCprivateSubnetSubnet2Subnet4D44975F"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "VPC/CustomVPC/privateSubnetSubnet2/RouteTableAssociation"
+      }
+    },
+    "CustomVPCprivateSubnetSubnet2DefaultRouteAF537149": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "CustomVPCprivateSubnetSubnet2RouteTable02C5A89E"
+        },
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "NatGatewayId": {
+          "Ref": "CustomVPCpublicSubnetSubnet1NATGatewayDDE2B218"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "VPC/CustomVPC/privateSubnetSubnet2/DefaultRoute"
+      }
+    },
+    "CustomVPCIGWCB65EB6B": {
+      "Type": "AWS::EC2::InternetGateway",
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "VPC/CustomVPC"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "VPC/CustomVPC/IGW"
+      }
+    },
+    "CustomVPCVPCGW9371D645": {
+      "Type": "AWS::EC2::VPCGatewayAttachment",
+      "Properties": {
+        "VpcId": {
+          "Ref": "CustomVPC616E3387"
+        },
+        "InternetGatewayId": {
+          "Ref": "CustomVPCIGWCB65EB6B"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "VPC/CustomVPC/VPCGW"
+      }
+    },
+    "egresssecuritygroup21695EBD": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "VPC/egress-security-group",
+        "GroupName": "EgressSecurityGroup",
+        "SecurityGroupEgress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow all outbound traffic by default",
+            "IpProtocol": "-1"
+          }
+        ],
+        "VpcId": {
+          "Ref": "CustomVPC616E3387"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "VPC/egress-security-group/Resource"
+      }
+    },
+    "CDKMetadata": {
+      "Type": "AWS::CDK::Metadata",
+      "Properties": {
+        "Modules": "aws-cdk=1.65.0,@aws-cdk/assets=1.65.0,@aws-cdk/aws-apigateway=1.65.0,@aws-cdk/aws-applicationautoscaling=1.65.0,@aws-cdk/aws-autoscaling=1.65.0,@aws-cdk/aws-autoscaling-common=1.65.0,@aws-cdk/aws-autoscaling-hooktargets=1.65.0,@aws-cdk/aws-certificatemanager=1.65.0,@aws-cdk/aws-cloudformation=1.65.0,@aws-cdk/aws-cloudfront=1.65.0,@aws-cdk/aws-cloudwatch=1.65.0,@aws-cdk/aws-codebuild=1.65.0,@aws-cdk/aws-codedeploy=1.65.0,@aws-cdk/aws-codeguruprofiler=1.65.0,@aws-cdk/aws-codepipeline=1.65.0,@aws-cdk/aws-codepipeline-actions=1.65.0,@aws-cdk/aws-ec2=1.65.0,@aws-cdk/aws-ecr=1.65.0,@aws-cdk/aws-ecr-assets=1.65.0,@aws-cdk/aws-ecs=1.65.0,@aws-cdk/aws-efs=1.65.0,@aws-cdk/aws-elasticloadbalancingv2=1.65.0,@aws-cdk/aws-events=1.65.0,@aws-cdk/aws-events-targets=1.65.0,@aws-cdk/aws-iam=1.65.0,@aws-cdk/aws-kms=1.65.0,@aws-cdk/aws-lambda=1.65.0,@aws-cdk/aws-logs=1.65.0,@aws-cdk/aws-rds=1.65.0,@aws-cdk/aws-s3=1.65.0,@aws-cdk/aws-s3-assets=1.65.0,@aws-cdk/aws-sam=1.65.0,@aws-cdk/aws-secretsmanager=1.65.0,@aws-cdk/aws-servicediscovery=1.65.0,@aws-cdk/aws-sns=1.65.0,@aws-cdk/aws-sns-subscriptions=1.65.0,@aws-cdk/aws-sqs=1.65.0,@aws-cdk/aws-ssm=1.65.0,@aws-cdk/cloud-assembly-schema=1.65.0,@aws-cdk/core=1.65.0,@aws-cdk/custom-resources=1.65.0,@aws-cdk/cx-api=1.65.0,@aws-cdk/region-info=1.65.0,jsii-runtime=node.js/v14.8.0"
+      },
+      "Metadata": {
+        "aws:cdk:path": "VPC/CDKMetadata/Default"
+      },
+      "Condition": "CDKMetadataAvailable"
+    }
+  },
+  "Conditions": {
+    "CDKMetadataAvailable": {
+      "Fn::Or": [
+        {
+          "Fn::Or": [
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-east-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-northeast-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-northeast-2"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-south-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-southeast-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-southeast-2"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ca-central-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "cn-north-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "cn-northwest-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-central-1"
+              ]
+            }
+          ]
+        },
+        {
+          "Fn::Or": [
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-north-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-west-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-west-2"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-west-3"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "me-south-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "sa-east-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "us-east-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "us-east-2"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "us-west-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "us-west-2"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "Outputs": {
+    "ExportsOutputRefCustomVPC616E3387378F0964": {
+      "Value": {
+        "Ref": "CustomVPC616E3387"
+      },
+      "Export": {
+        "Name": "VPC:ExportsOutputRefCustomVPC616E3387378F0964"
+      }
+    },
+    "ExportsOutputRefCustomVPCprivateSubnetSubnet1Subnet6940697DA44C7CEE": {
+      "Value": {
+        "Ref": "CustomVPCprivateSubnetSubnet1Subnet6940697D"
+      },
+      "Export": {
+        "Name": "VPC:ExportsOutputRefCustomVPCprivateSubnetSubnet1Subnet6940697DA44C7CEE"
+      }
+    },
+    "ExportsOutputRefCustomVPCprivateSubnetSubnet2Subnet4D44975F0C746531": {
+      "Value": {
+        "Ref": "CustomVPCprivateSubnetSubnet2Subnet4D44975F"
+      },
+      "Export": {
+        "Name": "VPC:ExportsOutputRefCustomVPCprivateSubnetSubnet2Subnet4D44975F0C746531"
+      }
+    },
+    "ExportsOutputFnGetAttegresssecuritygroup21695EBDGroupId15DA57EC": {
+      "Value": {
+        "Fn::GetAtt": [
+          "egresssecuritygroup21695EBD",
+          "GroupId"
+        ]
+      },
+      "Export": {
+        "Name": "VPC:ExportsOutputFnGetAttegresssecuritygroup21695EBDGroupId15DA57EC"
+      }
+    }
+  }
+}

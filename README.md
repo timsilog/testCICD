@@ -135,3 +135,11 @@ Sample basic bucket `policy.json`:
 [More Bucket Policy Examples](https://docs.aws.amazon.com/AmazonS3/latest/dev/example-bucket-policies.html)
 
 [More simple s3 cli commands](https://docs.aws.amazon.com/cli/latest/userguide/cli-services-s3-commands.html)
+
+## Cloudfront Stuff
+
+```
+aws cloudfront create-invalidation \
+--distribution-id DIST_ID \
+--invalidation-batch file://invalidation-config-filename.json
+```

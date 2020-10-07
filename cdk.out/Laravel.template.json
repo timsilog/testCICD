@@ -1,0 +1,1119 @@
+{
+  "Resources": {
+    "LaravelLambdaServiceRoleD4A29864": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+              ]
+            ]
+          },
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+              ]
+            ]
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Laravel/Laravel_Lambda/ServiceRole/Resource"
+      }
+    },
+    "LaravelLambdaServiceRoleDefaultPolicy0D46398D": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "elasticfilesystem:ClientMount",
+              "Condition": {
+                "StringEquals": {
+                  "elasticfilesystem:AccessPointArn": {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "arn:",
+                        {
+                          "Ref": "AWS::Partition"
+                        },
+                        ":elasticfilesystem:",
+                        {
+                          "Ref": "AWS::Region"
+                        },
+                        ":",
+                        {
+                          "Ref": "AWS::AccountId"
+                        },
+                        ":access-point/",
+                        {
+                          "Fn::ImportValue": "Storage2:ExportsOutputRefWordpressEFSAccessPoint0BAB0662B0F131DF"
+                        }
+                      ]
+                    ]
+                  }
+                }
+              },
+              "Effect": "Allow",
+              "Resource": "*"
+            },
+            {
+              "Action": "elasticfilesystem:ClientWrite",
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":elasticfilesystem:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":file-system/",
+                    {
+                      "Fn::ImportValue": "Storage2:ExportsOutputRefWordpressEFSDBDB4AAEFE31A04A"
+                    }
+                  ]
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "PolicyName": "LaravelLambdaServiceRoleDefaultPolicy0D46398D",
+        "Roles": [
+          {
+            "Ref": "LaravelLambdaServiceRoleD4A29864"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Laravel/Laravel_Lambda/ServiceRole/DefaultPolicy/Resource"
+      }
+    },
+    "LaravelLambdaDA20D9DA": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "AssetParameters714eb2f6f0e728c60184d1d79a45ab7a6f2d01c7853ffa8eff295f22a8d475e9S3BucketA0B7BC87"
+          },
+          "S3Key": {
+            "Fn::Join": [
+              "",
+              [
+                {
+                  "Fn::Select": [
+                    0,
+                    {
+                      "Fn::Split": [
+                        "||",
+                        {
+                          "Ref": "AssetParameters714eb2f6f0e728c60184d1d79a45ab7a6f2d01c7853ffa8eff295f22a8d475e9S3VersionKey9FB324DF"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "Fn::Select": [
+                    1,
+                    {
+                      "Fn::Split": [
+                        "||",
+                        {
+                          "Ref": "AssetParameters714eb2f6f0e728c60184d1d79a45ab7a6f2d01c7853ffa8eff295f22a8d475e9S3VersionKey9FB324DF"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        },
+        "Handler": "public/index.php",
+        "Role": {
+          "Fn::GetAtt": [
+            "LaravelLambdaServiceRoleD4A29864",
+            "Arn"
+          ]
+        },
+        "Runtime": "provided",
+        "Description": "Generated on: 2020-10-07T22:03:13.220Z",
+        "Environment": {
+          "Variables": {
+            "MY_VARIABLE": "test",
+            "WORDPRESS_DB_ENDPOINT": {
+              "Fn::ImportValue": "Database:ExportsOutputFnGetAttmysqlrdsinstance67C7D162EndpointAddress5C225769"
+            },
+            "WORDPRESS_DB_PORT": {
+              "Fn::ImportValue": "Database:ExportsOutputFnGetAttmysqlrdsinstance67C7D162EndpointPortEEFD6425"
+            },
+            "WORDPRESS_DB_NAME": "Wordpress",
+            "WORDPRESS_DB_USERNAME": "wordpress_admin",
+            "WORDPRESS_DB_PASSWORD": ""
+          }
+        },
+        "FileSystemConfigs": [
+          {
+            "LocalMountPath": "/mnt/efs",
+            "Arn": {
+              "Fn::Join": [
+                "",
+                [
+                  "arn:",
+                  {
+                    "Ref": "AWS::Partition"
+                  },
+                  ":elasticfilesystem:",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  ":",
+                  {
+                    "Ref": "AWS::AccountId"
+                  },
+                  ":access-point/",
+                  {
+                    "Fn::ImportValue": "Storage2:ExportsOutputRefWordpressEFSAccessPoint0BAB0662B0F131DF"
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "Layers": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:aws:lambda:",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ":209497400698:layer:php-74-fpm:11"
+              ]
+            ]
+          }
+        ],
+        "MemorySize": 1024,
+        "Timeout": 28,
+        "VpcConfig": {
+          "SecurityGroupIds": [
+            {
+              "Fn::ImportValue": "Database:ExportsOutputFnGetAttrdssecuritygroupFB88BAE5GroupId90A39632"
+            },
+            {
+              "Fn::ImportValue": "IamCommon:ExportsOutputFnGetAttefssecuritygroup5B03FC4EGroupId967354AA"
+            }
+          ],
+          "SubnetIds": [
+            {
+              "Fn::ImportValue": "VPC:ExportsOutputRefCustomVPCprivateSubnetSubnet1Subnet6940697DA44C7CEE"
+            },
+            {
+              "Fn::ImportValue": "VPC:ExportsOutputRefCustomVPCprivateSubnetSubnet2Subnet4D44975F0C746531"
+            }
+          ]
+        }
+      },
+      "DependsOn": [
+        "LaravelLambdaServiceRoleDefaultPolicy0D46398D",
+        "LaravelLambdaServiceRoleD4A29864"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "Laravel/Laravel_Lambda/Resource",
+        "aws:asset:path": "asset.714eb2f6f0e728c60184d1d79a45ab7a6f2d01c7853ffa8eff295f22a8d475e9",
+        "aws:asset:property": "Code"
+      }
+    },
+    "LaravelLambdaVersion20201007T220343195ZA23949DB": {
+      "Type": "AWS::Lambda::Version",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "LaravelLambdaDA20D9DA"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Laravel/Laravel_Lambda/Version2020-10-07T22:03:43.195Z/Resource"
+      }
+    },
+    "LaravelVersionAliasD1BF60A9": {
+      "Type": "AWS::Lambda::Alias",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "LaravelLambdaDA20D9DA"
+        },
+        "FunctionVersion": {
+          "Fn::GetAtt": [
+            "LaravelLambdaVersion20201007T220343195ZA23949DB",
+            "Version"
+          ]
+        },
+        "Name": "Prod"
+      },
+      "UpdatePolicy": {
+        "CodeDeployLambdaAliasUpdate": {
+          "ApplicationName": {
+            "Ref": "LaravelDeploymentGroupApplicationC6DB8B6B"
+          },
+          "DeploymentGroupName": {
+            "Ref": "LaravelDeploymentGroup623BB632"
+          }
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Laravel/Laravel_VersionAlias/Resource"
+      }
+    },
+    "LaravelDeploymentGroupApplicationC6DB8B6B": {
+      "Type": "AWS::CodeDeploy::Application",
+      "Properties": {
+        "ComputePlatform": "Lambda"
+      },
+      "Metadata": {
+        "aws:cdk:path": "Laravel/Laravel_DeploymentGroup/Application/Resource"
+      }
+    },
+    "LaravelDeploymentGroupServiceRole16963BDD": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "codedeploy.",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ".",
+                      {
+                        "Ref": "AWS::URLSuffix"
+                      }
+                    ]
+                  ]
+                }
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":iam::aws:policy/service-role/AWSCodeDeployRoleForLambdaLimited"
+              ]
+            ]
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Laravel/Laravel_DeploymentGroup/ServiceRole/Resource"
+      }
+    },
+    "LaravelDeploymentGroup623BB632": {
+      "Type": "AWS::CodeDeploy::DeploymentGroup",
+      "Properties": {
+        "ApplicationName": {
+          "Ref": "LaravelDeploymentGroupApplicationC6DB8B6B"
+        },
+        "ServiceRoleArn": {
+          "Fn::GetAtt": [
+            "LaravelDeploymentGroupServiceRole16963BDD",
+            "Arn"
+          ]
+        },
+        "AutoRollbackConfiguration": {
+          "Enabled": true,
+          "Events": [
+            "DEPLOYMENT_FAILURE"
+          ]
+        },
+        "DeploymentConfigName": "CodeDeployDefault.LambdaAllAtOnce",
+        "DeploymentStyle": {
+          "DeploymentOption": "WITH_TRAFFIC_CONTROL",
+          "DeploymentType": "BLUE_GREEN"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Laravel/Laravel_DeploymentGroup/Resource"
+      }
+    },
+    "LaravelAPIGateway4D5AAA65": {
+      "Type": "AWS::ApiGateway::RestApi",
+      "Properties": {
+        "Name": "Laravel_APIGateway"
+      },
+      "Metadata": {
+        "aws:cdk:path": "Laravel/Laravel_APIGateway/Resource"
+      }
+    },
+    "LaravelAPIGatewayCloudWatchRole9EC1935E": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "apigateway.amazonaws.com"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+              ]
+            ]
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Laravel/Laravel_APIGateway/CloudWatchRole/Resource"
+      }
+    },
+    "LaravelAPIGatewayAccountA3DE24FB": {
+      "Type": "AWS::ApiGateway::Account",
+      "Properties": {
+        "CloudWatchRoleArn": {
+          "Fn::GetAtt": [
+            "LaravelAPIGatewayCloudWatchRole9EC1935E",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": [
+        "LaravelAPIGateway4D5AAA65"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "Laravel/Laravel_APIGateway/Account"
+      }
+    },
+    "LaravelAPIGatewayDeployment649A08CF707538fb48a25c9dec8cd8138ae60ce5": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "LaravelAPIGateway4D5AAA65"
+        },
+        "Description": "Automatically created by the RestApi construct"
+      },
+      "DependsOn": [
+        "LaravelAPIGatewayproxyANY715BD9BC",
+        "LaravelAPIGatewayproxyB4E44762",
+        "LaravelAPIGatewayANY5D2F4944"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "Laravel/Laravel_APIGateway/Deployment/Resource"
+      }
+    },
+    "LaravelAPIGatewayDeploymentStageprodE1D91F18": {
+      "Type": "AWS::ApiGateway::Stage",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "LaravelAPIGateway4D5AAA65"
+        },
+        "DeploymentId": {
+          "Ref": "LaravelAPIGatewayDeployment649A08CF707538fb48a25c9dec8cd8138ae60ce5"
+        },
+        "StageName": "prod"
+      },
+      "Metadata": {
+        "aws:cdk:path": "Laravel/Laravel_APIGateway/DeploymentStage.prod/Resource"
+      }
+    },
+    "LaravelAPIGatewayproxyB4E44762": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {
+          "Fn::GetAtt": [
+            "LaravelAPIGateway4D5AAA65",
+            "RootResourceId"
+          ]
+        },
+        "PathPart": "{proxy+}",
+        "RestApiId": {
+          "Ref": "LaravelAPIGateway4D5AAA65"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Laravel/Laravel_APIGateway/Default/{proxy+}/Resource"
+      }
+    },
+    "LaravelAPIGatewayproxyANYApiPermissionLaravelLaravelAPIGateway7D4F1113ANYproxy363876DB": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "LaravelLambdaDA20D9DA",
+            "Arn"
+          ]
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "LaravelAPIGateway4D5AAA65"
+              },
+              "/",
+              {
+                "Ref": "LaravelAPIGatewayDeploymentStageprodE1D91F18"
+              },
+              "/*/*"
+            ]
+          ]
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Laravel/Laravel_APIGateway/Default/{proxy+}/ANY/ApiPermission.LaravelLaravelAPIGateway7D4F1113.ANY..{proxy+}"
+      }
+    },
+    "LaravelAPIGatewayproxyANYApiPermissionTestLaravelLaravelAPIGateway7D4F1113ANYproxyE1AAF0CB": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "LaravelLambdaDA20D9DA",
+            "Arn"
+          ]
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "LaravelAPIGateway4D5AAA65"
+              },
+              "/test-invoke-stage/*/*"
+            ]
+          ]
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Laravel/Laravel_APIGateway/Default/{proxy+}/ANY/ApiPermission.Test.LaravelLaravelAPIGateway7D4F1113.ANY..{proxy+}"
+      }
+    },
+    "LaravelAPIGatewayproxyANY715BD9BC": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "HttpMethod": "ANY",
+        "ResourceId": {
+          "Ref": "LaravelAPIGatewayproxyB4E44762"
+        },
+        "RestApiId": {
+          "Ref": "LaravelAPIGateway4D5AAA65"
+        },
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":apigateway:",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "LaravelLambdaDA20D9DA",
+                    "Arn"
+                  ]
+                },
+                "/invocations"
+              ]
+            ]
+          }
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Laravel/Laravel_APIGateway/Default/{proxy+}/ANY/Resource"
+      }
+    },
+    "LaravelAPIGatewayANYApiPermissionLaravelLaravelAPIGateway7D4F1113ANY432AE1C4": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "LaravelLambdaDA20D9DA",
+            "Arn"
+          ]
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "LaravelAPIGateway4D5AAA65"
+              },
+              "/",
+              {
+                "Ref": "LaravelAPIGatewayDeploymentStageprodE1D91F18"
+              },
+              "/*/"
+            ]
+          ]
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Laravel/Laravel_APIGateway/Default/ANY/ApiPermission.LaravelLaravelAPIGateway7D4F1113.ANY.."
+      }
+    },
+    "LaravelAPIGatewayANYApiPermissionTestLaravelLaravelAPIGateway7D4F1113ANY62DC18EB": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "LaravelLambdaDA20D9DA",
+            "Arn"
+          ]
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "LaravelAPIGateway4D5AAA65"
+              },
+              "/test-invoke-stage/*/"
+            ]
+          ]
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Laravel/Laravel_APIGateway/Default/ANY/ApiPermission.Test.LaravelLaravelAPIGateway7D4F1113.ANY.."
+      }
+    },
+    "LaravelAPIGatewayANY5D2F4944": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "HttpMethod": "ANY",
+        "ResourceId": {
+          "Fn::GetAtt": [
+            "LaravelAPIGateway4D5AAA65",
+            "RootResourceId"
+          ]
+        },
+        "RestApiId": {
+          "Ref": "LaravelAPIGateway4D5AAA65"
+        },
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":apigateway:",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "LaravelLambdaDA20D9DA",
+                    "Arn"
+                  ]
+                },
+                "/invocations"
+              ]
+            ]
+          }
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Laravel/Laravel_APIGateway/Default/ANY/Resource"
+      }
+    },
+    "LaravelCloudfrontCFDistribution475E37CE": {
+      "Type": "AWS::CloudFront::Distribution",
+      "Properties": {
+        "DistributionConfig": {
+          "CacheBehaviors": [
+            {
+              "AllowedMethods": [
+                "GET",
+                "HEAD"
+              ],
+              "CachedMethods": [
+                "GET",
+                "HEAD"
+              ],
+              "Compress": true,
+              "ForwardedValues": {
+                "Cookies": {
+                  "Forward": "none"
+                },
+                "QueryString": false
+              },
+              "PathPattern": "/public/assets/*",
+              "TargetOriginId": "origin1",
+              "ViewerProtocolPolicy": "redirect-to-https"
+            }
+          ],
+          "DefaultCacheBehavior": {
+            "AllowedMethods": [
+              "DELETE",
+              "GET",
+              "HEAD",
+              "OPTIONS",
+              "PATCH",
+              "POST",
+              "PUT"
+            ],
+            "CachedMethods": [
+              "GET",
+              "HEAD"
+            ],
+            "Compress": true,
+            "DefaultTTL": 0,
+            "ForwardedValues": {
+              "Cookies": {
+                "Forward": "all"
+              },
+              "Headers": [
+                "*"
+              ],
+              "QueryString": true
+            },
+            "MaxTTL": 0,
+            "MinTTL": 0,
+            "TargetOriginId": "origin2",
+            "ViewerProtocolPolicy": "redirect-to-https"
+          },
+          "DefaultRootObject": "index.php",
+          "Enabled": true,
+          "HttpVersion": "http2",
+          "IPV6Enabled": true,
+          "Origins": [
+            {
+              "ConnectionAttempts": 3,
+              "ConnectionTimeout": 10,
+              "DomainName": {
+                "Fn::ImportValue": "Storage2:ExportsOutputFnGetAttWordpressS3523C628CRegionalDomainNameFF6EA16D"
+              },
+              "Id": "origin1",
+              "S3OriginConfig": {
+                "OriginAccessIdentity": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "origin-access-identity/cloudfront/",
+                      {
+                        "Fn::ImportValue": "IamCommon:ExportsOutputRefOAIE1EFC67F0E3C3AB5"
+                      }
+                    ]
+                  ]
+                }
+              }
+            },
+            {
+              "ConnectionAttempts": 3,
+              "ConnectionTimeout": 10,
+              "CustomOriginConfig": {
+                "HTTPPort": 80,
+                "HTTPSPort": 443,
+                "OriginKeepaliveTimeout": 5,
+                "OriginProtocolPolicy": "https-only",
+                "OriginReadTimeout": 30,
+                "OriginSSLProtocols": [
+                  "TLSv1.2"
+                ]
+              },
+              "DomainName": {
+                "Fn::Join": [
+                  "",
+                  [
+                    {
+                      "Ref": "LaravelAPIGateway4D5AAA65"
+                    },
+                    ".execute-api.",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ".",
+                    {
+                      "Ref": "AWS::URLSuffix"
+                    }
+                  ]
+                ]
+              },
+              "Id": "origin2",
+              "OriginPath": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "/",
+                    {
+                      "Ref": "LaravelAPIGatewayDeploymentStageprodE1D91F18"
+                    }
+                  ]
+                ]
+              }
+            }
+          ],
+          "PriceClass": "PriceClass_100",
+          "ViewerCertificate": {
+            "CloudFrontDefaultCertificate": true
+          }
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Laravel/Laravel_Cloudfront/CFDistribution"
+      }
+    },
+    "CDKMetadata": {
+      "Type": "AWS::CDK::Metadata",
+      "Properties": {
+        "Modules": "aws-cdk=1.65.0,@aws-cdk/assets=1.65.0,@aws-cdk/aws-apigateway=1.65.0,@aws-cdk/aws-applicationautoscaling=1.65.0,@aws-cdk/aws-autoscaling=1.65.0,@aws-cdk/aws-autoscaling-common=1.65.0,@aws-cdk/aws-autoscaling-hooktargets=1.65.0,@aws-cdk/aws-certificatemanager=1.65.0,@aws-cdk/aws-cloudformation=1.65.0,@aws-cdk/aws-cloudfront=1.65.0,@aws-cdk/aws-cloudwatch=1.65.0,@aws-cdk/aws-codebuild=1.65.0,@aws-cdk/aws-codedeploy=1.65.0,@aws-cdk/aws-codeguruprofiler=1.65.0,@aws-cdk/aws-codepipeline=1.65.0,@aws-cdk/aws-codepipeline-actions=1.65.0,@aws-cdk/aws-ec2=1.65.0,@aws-cdk/aws-ecr=1.65.0,@aws-cdk/aws-ecr-assets=1.65.0,@aws-cdk/aws-ecs=1.65.0,@aws-cdk/aws-efs=1.65.0,@aws-cdk/aws-elasticloadbalancingv2=1.65.0,@aws-cdk/aws-events=1.65.0,@aws-cdk/aws-events-targets=1.65.0,@aws-cdk/aws-iam=1.65.0,@aws-cdk/aws-kms=1.65.0,@aws-cdk/aws-lambda=1.65.0,@aws-cdk/aws-logs=1.65.0,@aws-cdk/aws-rds=1.65.0,@aws-cdk/aws-s3=1.65.0,@aws-cdk/aws-s3-assets=1.65.0,@aws-cdk/aws-sam=1.65.0,@aws-cdk/aws-secretsmanager=1.65.0,@aws-cdk/aws-servicediscovery=1.65.0,@aws-cdk/aws-sns=1.65.0,@aws-cdk/aws-sns-subscriptions=1.65.0,@aws-cdk/aws-sqs=1.65.0,@aws-cdk/aws-ssm=1.65.0,@aws-cdk/cloud-assembly-schema=1.65.0,@aws-cdk/core=1.65.0,@aws-cdk/custom-resources=1.65.0,@aws-cdk/cx-api=1.65.0,@aws-cdk/region-info=1.65.0,jsii-runtime=node.js/v14.8.0"
+      },
+      "Metadata": {
+        "aws:cdk:path": "Laravel/CDKMetadata/Default"
+      },
+      "Condition": "CDKMetadataAvailable"
+    }
+  },
+  "Parameters": {
+    "AssetParameters714eb2f6f0e728c60184d1d79a45ab7a6f2d01c7853ffa8eff295f22a8d475e9S3BucketA0B7BC87": {
+      "Type": "String",
+      "Description": "S3 bucket for asset \"714eb2f6f0e728c60184d1d79a45ab7a6f2d01c7853ffa8eff295f22a8d475e9\""
+    },
+    "AssetParameters714eb2f6f0e728c60184d1d79a45ab7a6f2d01c7853ffa8eff295f22a8d475e9S3VersionKey9FB324DF": {
+      "Type": "String",
+      "Description": "S3 key for asset version \"714eb2f6f0e728c60184d1d79a45ab7a6f2d01c7853ffa8eff295f22a8d475e9\""
+    },
+    "AssetParameters714eb2f6f0e728c60184d1d79a45ab7a6f2d01c7853ffa8eff295f22a8d475e9ArtifactHash46C38133": {
+      "Type": "String",
+      "Description": "Artifact hash for asset \"714eb2f6f0e728c60184d1d79a45ab7a6f2d01c7853ffa8eff295f22a8d475e9\""
+    }
+  },
+  "Outputs": {
+    "LaravelAPIGatewayEndpoint9B1D46D6": {
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "https://",
+            {
+              "Ref": "LaravelAPIGateway4D5AAA65"
+            },
+            ".execute-api.",
+            {
+              "Ref": "AWS::Region"
+            },
+            ".",
+            {
+              "Ref": "AWS::URLSuffix"
+            },
+            "/",
+            {
+              "Ref": "LaravelAPIGatewayDeploymentStageprodE1D91F18"
+            },
+            "/"
+          ]
+        ]
+      }
+    }
+  },
+  "Conditions": {
+    "CDKMetadataAvailable": {
+      "Fn::Or": [
+        {
+          "Fn::Or": [
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-east-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-northeast-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-northeast-2"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-south-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-southeast-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-southeast-2"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ca-central-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "cn-north-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "cn-northwest-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-central-1"
+              ]
+            }
+          ]
+        },
+        {
+          "Fn::Or": [
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-north-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-west-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-west-2"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-west-3"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "me-south-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "sa-east-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "us-east-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "us-east-2"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "us-west-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "us-west-2"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

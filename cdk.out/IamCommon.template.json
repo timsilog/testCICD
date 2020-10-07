@@ -1,0 +1,244 @@
+{
+  "Resources": {
+    "efssecuritygroup5B03FC4E": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "IamCommon/efs-security-group",
+        "GroupName": "EFSSecurityGroup",
+        "VpcId": {
+          "Fn::ImportValue": "VPC:ExportsOutputRefCustomVPC616E3387378F0964"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "IamCommon/efs-security-group/Resource"
+      }
+    },
+    "OAIE1EFC67F": {
+      "Type": "AWS::CloudFront::CloudFrontOriginAccessIdentity",
+      "Properties": {
+        "CloudFrontOriginAccessIdentityConfig": {
+          "Comment": "Allows CloudFront to reach the bucket"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "IamCommon/OAI/Resource"
+      }
+    },
+    "CDKMetadata": {
+      "Type": "AWS::CDK::Metadata",
+      "Properties": {
+        "Modules": "aws-cdk=1.65.0,@aws-cdk/assets=1.65.0,@aws-cdk/aws-apigateway=1.65.0,@aws-cdk/aws-applicationautoscaling=1.65.0,@aws-cdk/aws-autoscaling=1.65.0,@aws-cdk/aws-autoscaling-common=1.65.0,@aws-cdk/aws-autoscaling-hooktargets=1.65.0,@aws-cdk/aws-certificatemanager=1.65.0,@aws-cdk/aws-cloudformation=1.65.0,@aws-cdk/aws-cloudfront=1.65.0,@aws-cdk/aws-cloudwatch=1.65.0,@aws-cdk/aws-codebuild=1.65.0,@aws-cdk/aws-codedeploy=1.65.0,@aws-cdk/aws-codeguruprofiler=1.65.0,@aws-cdk/aws-codepipeline=1.65.0,@aws-cdk/aws-codepipeline-actions=1.65.0,@aws-cdk/aws-ec2=1.65.0,@aws-cdk/aws-ecr=1.65.0,@aws-cdk/aws-ecr-assets=1.65.0,@aws-cdk/aws-ecs=1.65.0,@aws-cdk/aws-efs=1.65.0,@aws-cdk/aws-elasticloadbalancingv2=1.65.0,@aws-cdk/aws-events=1.65.0,@aws-cdk/aws-events-targets=1.65.0,@aws-cdk/aws-iam=1.65.0,@aws-cdk/aws-kms=1.65.0,@aws-cdk/aws-lambda=1.65.0,@aws-cdk/aws-logs=1.65.0,@aws-cdk/aws-rds=1.65.0,@aws-cdk/aws-s3=1.65.0,@aws-cdk/aws-s3-assets=1.65.0,@aws-cdk/aws-sam=1.65.0,@aws-cdk/aws-secretsmanager=1.65.0,@aws-cdk/aws-servicediscovery=1.65.0,@aws-cdk/aws-sns=1.65.0,@aws-cdk/aws-sns-subscriptions=1.65.0,@aws-cdk/aws-sqs=1.65.0,@aws-cdk/aws-ssm=1.65.0,@aws-cdk/cloud-assembly-schema=1.65.0,@aws-cdk/core=1.65.0,@aws-cdk/custom-resources=1.65.0,@aws-cdk/cx-api=1.65.0,@aws-cdk/region-info=1.65.0,jsii-runtime=node.js/v14.8.0"
+      },
+      "Metadata": {
+        "aws:cdk:path": "IamCommon/CDKMetadata/Default"
+      },
+      "Condition": "CDKMetadataAvailable"
+    }
+  },
+  "Conditions": {
+    "CDKMetadataAvailable": {
+      "Fn::Or": [
+        {
+          "Fn::Or": [
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-east-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-northeast-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-northeast-2"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-south-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-southeast-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-southeast-2"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ca-central-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "cn-north-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "cn-northwest-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-central-1"
+              ]
+            }
+          ]
+        },
+        {
+          "Fn::Or": [
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-north-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-west-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-west-2"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-west-3"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "me-south-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "sa-east-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "us-east-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "us-east-2"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "us-west-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "us-west-2"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "Outputs": {
+    "ExportsOutputFnGetAttefssecuritygroup5B03FC4EGroupId967354AA": {
+      "Value": {
+        "Fn::GetAtt": [
+          "efssecuritygroup5B03FC4E",
+          "GroupId"
+        ]
+      },
+      "Export": {
+        "Name": "IamCommon:ExportsOutputFnGetAttefssecuritygroup5B03FC4EGroupId967354AA"
+      }
+    },
+    "ExportsOutputFnGetAttOAIE1EFC67FS3CanonicalUserId143C2ABE": {
+      "Value": {
+        "Fn::GetAtt": [
+          "OAIE1EFC67F",
+          "S3CanonicalUserId"
+        ]
+      },
+      "Export": {
+        "Name": "IamCommon:ExportsOutputFnGetAttOAIE1EFC67FS3CanonicalUserId143C2ABE"
+      }
+    },
+    "ExportsOutputRefOAIE1EFC67F0E3C3AB5": {
+      "Value": {
+        "Ref": "OAIE1EFC67F"
+      },
+      "Export": {
+        "Name": "IamCommon:ExportsOutputRefOAIE1EFC67F0E3C3AB5"
+      }
+    }
+  }
+}
