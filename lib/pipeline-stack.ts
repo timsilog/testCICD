@@ -2,15 +2,16 @@ import * as cdk from "@aws-cdk/core";
 import { App, Duration, Stack, StackProps, SecretValue } from "@aws-cdk/core";
 import { Peer, Port, SecurityGroup, SubnetType, Vpc } from "@aws-cdk/aws-ec2";
 import * as efs from "@aws-cdk/aws-efs";
-import * as codepipeline_actions from "@aws-cdk/aws-codepipeline-actions";
+import { CodeBuildAction, GitHubSourceAction, GitHubTrigger } from "@aws-cdk/aws-codepipeline-actions/lib";
 import * as codepipeline from "@aws-cdk/aws-codepipeline";
-import * as codebuild from "@aws-cdk/aws-codebuild";
+import { PipelineProject, BuildSpec, FileSystemLocation, LinuxBuildImage } from "@aws-cdk/aws-codebuild/lib";
 import * as s3 from "@aws-cdk/aws-s3";
 import { CloudFrontWebDistribution } from '@aws-cdk/aws-cloudfront';
 import { Role, PolicyStatement, Effect, ManagedPolicy, ServicePrincipal, CompositePrincipal } from "@aws-cdk/aws-iam";
 import { ISecret, Secret, SecretStringGenerator } from "@aws-cdk/aws-secretsmanager";
 import { load } from "ts-dotenv";
 import { PolicyDocument } from "@aws-cdk/aws-iam/lib";
+import config from '../config';
 
 const env = load({
     GITHUB_TOKEN: String
@@ -170,10 +171,10 @@ export class PipelineStack extends cdk.Stack {
         });
 
         // Build Lambda
-        const lambdaBuild = new codebuild.PipelineProject(this, "LambdaBuild", {
+        const lambdaBuild = new PipelineProject(this, "LambdaBuild", {
             role: codeBuildUser,
             vpc: props.vpc,
-            buildSpec: codebuild.BuildSpec.fromObject({
+            buildSpec: BuildSpec.fromObject({
                 version: "0.2",
                 phases: {
                     install: {
@@ -183,8 +184,8 @@ export class PipelineStack extends cdk.Stack {
                         commands: [
                             // 'npm i -g aws-cdk serverless',
                             'npm i',
-                            'ls -la',
-                            'cd laravel && composer install && npm i && npm run build && cd ../',
+                            'cd laravel',
+                            'composer install && npm i && npm run prod && cd ../',
                         ]
                     },
                     build: {
@@ -203,15 +204,15 @@ export class PipelineStack extends cdk.Stack {
                 }
             }),
             fileSystemLocations: [
-                codebuild.FileSystemLocation.efs({
-                    identifier: "codebuild_efs",
-                    location: props.efs.fileSystemId + '.efs.' + props.vpc.env.region + '.amazonaws.com' + ':' + '/export/lambda',
+                FileSystemLocation.efs({
+                    identifier: config.appName + "_codebuild_efs_location",
+                    location: props.efs.fileSystemId + '.efs.' + props.vpc.env.region + '.amazonaws.com' + ':' + '/',
                     mountPoint: '/mnt/efs',
                     mountOptions: 'nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport',
                 })
             ],
             environment: {
-                buildImage: codebuild.LinuxBuildImage.STANDARD_4_0,
+                buildImage: LinuxBuildImage.STANDARD_4_0,
                 privileged: true,
             },
             environmentVariables: {
@@ -221,6 +222,64 @@ export class PipelineStack extends cdk.Stack {
         });
 
 
+        // Deploy Assets
+        const deploy = new PipelineProject(this, config.appName + "_deploy", {
+            role: codeBuildUser,
+            vpc: props.vpc,
+            buildSpec: BuildSpec.fromObject({
+                version: "0.2",
+                phases: {
+                    install: {
+                        "runtime-versions": {
+                            php: 7.4
+                        },
+                        commands: [
+                            'npm i -g aws-cdk',
+                            'npm i',
+                            // 'apt-get update && apt-get install -y mysql-client zip',
+                            // 'curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar',
+                            // 'chmod +x wp-cli.phar',
+                            // 'mv wp-cli.phar /usr/local/bin/wp',
+                        ]
+                    },
+                    build: {
+                        commands: [
+                            'npm run build',
+                            // 'cd wordpress/wp-core',
+                            // 'wp core install --url=https://' + props.cloudfront.distributionDomainName + ' --title="Lambda POC" --admin_name=' + config.wordpressAdminUser + ' --admin_password=' + config.wordpressAdminPassword + ' --admin_email=' + config.wordpressAdminEmail + ' --allow-root',
+                            // 'wp rewrite structure "/%year%/%monthnum%/%postname%/" --allow-root',
+                            // 'cd ../../',
+                            // `aws s3 sync wordpress/wp-core s3://${props.s3.bucketName}/assets --exact-timestamps --quiet --exclude '*' --include "*.js" --include "*.css" --include "*.gif" --include "*.jpg" --include "*.png" --delete`,
+                            // "zip -r bundle.zip ./wordpress/wp-core",
+                            // "mv bundle.zip /mnt/efs/bundle.zip",
+                            "cdk deploy Laravel --exclusively"
+                        ]
+                    },
+                },
+                artifacts: {
+                    files: [
+                        "**/*"
+                    ]
+                }
+            }),
+            fileSystemLocations: [
+                FileSystemLocation.efs({
+                    identifier: config.appName + "_codebuild_efs_location",
+                    location: props.efs.fileSystemId + '.efs.' + props.vpc.env.region + '.amazonaws.com' + ':' + '/',
+                    mountPoint: '/mnt/efs',
+                    mountOptions: 'nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport',
+                })
+            ],
+            environment: {
+                buildImage: LinuxBuildImage.STANDARD_4_0,
+                privileged: true,
+            },
+            environmentVariables: {
+                GITHUB_TOKEN: { value: env.GITHUB_TOKEN }
+            },
+            securityGroups: [props.databaseAccessSecurityGroup, props.efsAccessSecurityGroup, props.egressSecurityGroup]
+        });
+
         new codepipeline.Pipeline(this, 'Pipeline2', {
             role: codePipelineUser,
             restartExecutionOnUpdate: true,
@@ -228,48 +287,37 @@ export class PipelineStack extends cdk.Stack {
                 {
                     stageName: 'Source',
                     actions: [
-                        new codepipeline_actions.GitHubSourceAction({
+                        new GitHubSourceAction({
                             actionName: 'Checkout',
                             output: sourceOutput,
                             owner: "timsilog",
                             repo: "testCICD",
                             oauthToken: SecretValue.plainText(env.GITHUB_TOKEN),
-                            trigger: codepipeline_actions.GitHubTrigger.WEBHOOK,
+                            trigger: GitHubTrigger.WEBHOOK,
                         }),
                     ],
                 },
                 {
                     stageName: 'Build',
                     actions: [
-                        new codepipeline_actions.CodeBuildAction({
+                        new CodeBuildAction({
                             actionName: 'Lambda_Build',
                             project: lambdaBuild,
                             input: sourceOutput,
                             outputs: [lambdaBuildOutput],
                         }),
-                        // new codepipeline_actions.CodeBuildAction({
-                        //   actionName: 'CDK_Build',
-                        //   project: cdkBuild,
-                        //   input: sourceOutput,
-                        //   outputs: [cdkBuildOutput],
-                        // }),
                     ],
                 },
-                // {
-                //   stageName: 'Deploy',
-                //   actions: [
-                //     new codepipeline_actions.CloudFormationCreateUpdateStackAction({
-                //       actionName: 'Lambda_CFN_Deploy',
-                //       templatePath: cdkBuildOutput.atPath('LambdaStack.template.json'),
-                //       stackName: 'LambdaDeploymentStack',
-                //       adminPermissions: true,
-                //       parameterOverrides: {
-                //         ...props.lambdaCode.assign(lambdaBuildOutput.s3Location),
-                //       },
-                //       extraInputs: [lambdaBuildOutput],
-                //     }),
-                //   ],
-                // },
+                {
+                    stageName: 'Deploy',
+                    actions: [
+                        new CodeBuildAction({
+                            actionName: 'Deploy',
+                            project: deploy,
+                            input: lambdaBuildOutput,
+                        }),
+                    ],
+                },
             ],
         });
     }
