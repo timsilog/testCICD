@@ -182,22 +182,17 @@ export class PipelineStack extends cdk.Stack {
                             php: 7.4
                         },
                         commands: [
-                            // 'npm i -g aws-cdk serverless',
-                            'npm i',
                             'cd laravel',
-                            'composer install && npm i && npm run prod && cd ../',
+                            'composer install && npm i',
                         ]
                     },
                     build: {
                         commands: [
-                            "npm run build",
-                            `aws s3 sync laravel/public/assets s3://${props.s3.bucketName} --exclude *.php`,
-                            // "serverless deploy"
+                            'npm run prod && cd ../',
                         ]
                     },
                 },
                 artifacts: {
-                    "base-directory": "laravel",
                     files: [
                         "**/*"
                     ]
@@ -236,22 +231,12 @@ export class PipelineStack extends cdk.Stack {
                         commands: [
                             'npm i -g aws-cdk',
                             'npm i',
-                            // 'apt-get update && apt-get install -y mysql-client zip',
-                            // 'curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar',
-                            // 'chmod +x wp-cli.phar',
-                            // 'mv wp-cli.phar /usr/local/bin/wp',
                         ]
                     },
                     build: {
                         commands: [
                             'npm run build',
-                            // 'cd wordpress/wp-core',
-                            // 'wp core install --url=https://' + props.cloudfront.distributionDomainName + ' --title="Lambda POC" --admin_name=' + config.wordpressAdminUser + ' --admin_password=' + config.wordpressAdminPassword + ' --admin_email=' + config.wordpressAdminEmail + ' --allow-root',
-                            // 'wp rewrite structure "/%year%/%monthnum%/%postname%/" --allow-root',
-                            // 'cd ../../',
-                            // `aws s3 sync wordpress/wp-core s3://${props.s3.bucketName}/assets --exact-timestamps --quiet --exclude '*' --include "*.js" --include "*.css" --include "*.gif" --include "*.jpg" --include "*.png" --delete`,
-                            // "zip -r bundle.zip ./wordpress/wp-core",
-                            // "mv bundle.zip /mnt/efs/bundle.zip",
+                            `aws s3 sync laravel/public/assets s3://${props.s3.bucketName} --exclude *.php`,
                             "cdk deploy Laravel --exclusively"
                         ]
                     },

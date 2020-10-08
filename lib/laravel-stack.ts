@@ -55,7 +55,6 @@ export class LaravelStack extends cdk.Stack {
             handler: 'public/index.php',
             code: lambda.Code.fromAsset(path.resolve(__dirname, `../laravel`), {
                 exclude: [
-                    'vendor/**',
                     'node_modules/**',
                     'node_modules/.bin/**',
                     'public/assets/**',
