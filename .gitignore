@@ -15,3 +15,13 @@ Homestead.yaml
 npm-debug.log
 yarn-error.log
 .DS_Store
+
+.idea
+*.js
+!jest.config.js
+*.d.ts
+node_modules
+
+# CDK asset staging directory
+.cdk.staging
+cdk.out
