@@ -246,12 +246,12 @@ export class LaravelStack extends cdk.Stack {
             enableIpV6: true,
         });
 
-        console.log('cloudfront');
-        console.log(this.cloudfront);
-        console.log('other stuff\n');
-        console.log(this.cloudfront.distributionDomainName);
+        // console.log('cloudfront');
+        // console.log(this.cloudfront);
+        // console.log('other stuff\n');
+        // console.log(this.cloudfront.distributionDomainName);
 
-        this.lambda.addEnvironment('AWS_URL', this.cloudfront.distributionDomainName);
-        console.log(this.lambda);
+        // this.lambda.addEnvironment('AWS_URL', this.cloudfront.distributionDomainName);
+        // console.log(this.lambda);
     }
 }
