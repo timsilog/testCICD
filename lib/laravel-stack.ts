@@ -251,7 +251,7 @@ export class LaravelStack extends cdk.Stack {
         // console.log('other stuff\n');
         // console.log(this.cloudfront.distributionDomainName);
 
-        this.lambda.addEnvironment('AWS_URL', this.cloudfront.distributionDomainName);
+        // this.lambda.addEnvironment('AWS_URL', this.cloudfront.distributionDomainName);
         // console.log(this.lambda);
     }
 }
