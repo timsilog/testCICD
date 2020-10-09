@@ -169,7 +169,7 @@ export class LaravelStack extends cdk.Stack {
                 // AWS_SECRET_ACCESS_KEY: env.AWS_SECRET_ACCESS_KEY ? env.AWS_SECRET_ACCESS_KEY : '',
                 // AWS_DEFAULT_REGION: 'us-east-1',
                 AWS_BUCKET: props.s3.bucketName,
-                AWS_URL: 'd17oxptn001r4q.cloudfront.net',
+                AWS_URL: 'wrongurl',
 
                 // PUSHER_APP_ID: env.PUSHER_APP_ID ? env.PUSHER_APP_ID : '',
                 // PUSHER_APP_KEY: env.PUSHER_APP_KEY ? env.PUSHER_APP_KEY : '',
