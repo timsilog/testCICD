@@ -99,55 +99,6 @@ export class LaravelStack extends cdk.Stack {
             },
         });
 
-        // ApiGW
-        const apigw = new apigateway.LambdaRestApi(this, `${config.appName}_APIGateway`, {
-            handler: this.lambda,
-            proxy: true
-        });
-
-        // CF
-        props.s3.grantRead(props.oai); // must be granted explicitly
-        this.cloudfront = new CloudFrontWebDistribution(this, `${config.appName}_Cloudfront`, {
-            originConfigs: [
-                {
-                    s3OriginSource: {
-                        s3BucketSource: props.s3,
-                        originAccessIdentity: props.oai,
-                    },
-                    behaviors: [
-                        {
-                            pathPattern: "/public/assets/*"
-                        },
-                    ]
-                },
-                {
-                    customOriginSource: {
-                        domainName: `${apigw.restApiId}.execute-api.${this.region}.${this.urlSuffix}`,
-                    },
-                    originPath: '/' + apigw.deploymentStage.stageName,
-                    behaviors: [{
-                        allowedMethods: CloudFrontAllowedMethods.ALL,
-                        isDefaultBehavior: true,
-                        forwardedValues: {
-                            queryString: true,
-                            cookies: {
-                                forward: 'all'
-                            },
-                            headers: ['*']
-                        },
-                        minTtl: cdk.Duration.seconds(0),
-                        maxTtl: cdk.Duration.seconds(0),
-                        defaultTtl: cdk.Duration.seconds(0),
-                    }]
-                }
-            ],
-            enableIpV6: true,
-        });
-        console.log('cloudfront');
-        console.log(this.cloudfront);
-        console.log('other stuff\n');
-        console.log(this.cloudfront.distributionDomainName);
-
         this.lambda = new lambda.Function(this, `Laravel_Lambda`, {
             description: `Generated on: ${new Date().toISOString()}`,
             runtime: lambda.Runtime.PROVIDED,
@@ -218,7 +169,7 @@ export class LaravelStack extends cdk.Stack {
                 // AWS_SECRET_ACCESS_KEY: env.AWS_SECRET_ACCESS_KEY ? env.AWS_SECRET_ACCESS_KEY : '',
                 // AWS_DEFAULT_REGION: 'us-east-1',
                 AWS_BUCKET: props.s3.bucketName,
-                AWS_URL: this.cloudfront.distributionDomainName,
+                // AWS_URL: this.cloudfront.distributionDomainName,
 
                 // PUSHER_APP_ID: env.PUSHER_APP_ID ? env.PUSHER_APP_ID : '',
                 // PUSHER_APP_KEY: env.PUSHER_APP_KEY ? env.PUSHER_APP_KEY : '',
@@ -235,6 +186,59 @@ export class LaravelStack extends cdk.Stack {
                 WORDPRESS_DB_PASSWORD: props.rdsCredentials.secret ? props.rdsCredentials.secret.toString() : '', // empty string might be wrong here
             },
         });
+        console.log(this.lambda);
+
+        // ApiGW
+        const apigw = new apigateway.LambdaRestApi(this, `${config.appName}_APIGateway`, {
+            handler: this.lambda,
+            proxy: true
+        });
+
+        // CF
+        props.s3.grantRead(props.oai); // must be granted explicitly
+        this.cloudfront = new CloudFrontWebDistribution(this, `${config.appName}_Cloudfront`, {
+            originConfigs: [
+                {
+                    s3OriginSource: {
+                        s3BucketSource: props.s3,
+                        originAccessIdentity: props.oai,
+                    },
+                    behaviors: [
+                        {
+                            pathPattern: "/public/assets/*"
+                        },
+                    ]
+                },
+                {
+                    customOriginSource: {
+                        domainName: `${apigw.restApiId}.execute-api.${this.region}.${this.urlSuffix}`,
+                    },
+                    originPath: '/' + apigw.deploymentStage.stageName,
+                    behaviors: [{
+                        allowedMethods: CloudFrontAllowedMethods.ALL,
+                        isDefaultBehavior: true,
+                        forwardedValues: {
+                            queryString: true,
+                            cookies: {
+                                forward: 'all'
+                            },
+                            headers: ['*']
+                        },
+                        minTtl: cdk.Duration.seconds(0),
+                        maxTtl: cdk.Duration.seconds(0),
+                        defaultTtl: cdk.Duration.seconds(0),
+                    }]
+                }
+            ],
+            enableIpV6: true,
+        });
+        console.log('cloudfront');
+        console.log(this.cloudfront);
+        console.log('other stuff\n');
+        console.log(this.cloudfront.distributionDomainName);
+
+        this.lambda.addEnvironment('AWS_URL', this.cloudfront.distributionDomainName);
+        console.log(this.lambda);
 
         // lambdaversion
         const version = this.lambda.addVersion(new Date().toISOString());
