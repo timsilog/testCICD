@@ -90,6 +90,7 @@ export class PipelineStack extends cdk.Stack {
                             //resources: [props.cloudfront + '*'],
                             actions: [
                                 'cloudfront:GetDistribution',
+                                'cloudfront:UpdateDistribution'
                             ]
                         }),
                     ]

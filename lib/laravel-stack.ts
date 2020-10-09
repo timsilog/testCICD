@@ -196,7 +196,7 @@ export class LaravelStack extends cdk.Stack {
         });
 
         // codedeploy
-        const temp = new codedeploy.LambdaDeploymentGroup(this, `${config.appName}_DeploymentGroup`, {
+        new codedeploy.LambdaDeploymentGroup(this, `${config.appName}_DeploymentGroup`, {
             alias,
             deploymentConfig: codedeploy.LambdaDeploymentConfig.ALL_AT_ONCE,
         });
