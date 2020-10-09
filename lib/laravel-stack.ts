@@ -169,7 +169,7 @@ export class LaravelStack extends cdk.Stack {
                 // AWS_SECRET_ACCESS_KEY: env.AWS_SECRET_ACCESS_KEY ? env.AWS_SECRET_ACCESS_KEY : '',
                 // AWS_DEFAULT_REGION: 'us-east-1',
                 AWS_BUCKET: props.s3.bucketName,
-                // AWS_URL: this.cloudfront.distributionDomainName,
+                // AWS_URL: 'wrongurl',
 
                 // PUSHER_APP_ID: env.PUSHER_APP_ID ? env.PUSHER_APP_ID : '',
                 // PUSHER_APP_KEY: env.PUSHER_APP_KEY ? env.PUSHER_APP_KEY : '',
@@ -187,6 +187,19 @@ export class LaravelStack extends cdk.Stack {
             },
         });
         console.log(this.lambda);
+
+        // lambdaversion
+        const version = this.lambda.addVersion(new Date().toISOString());
+        const alias = new lambda.Alias(this, `${config.appName}_VersionAlias`, {
+            aliasName: 'Prod',
+            version,
+        });
+
+        // codedeploy
+        const temp = new codedeploy.LambdaDeploymentGroup(this, `${config.appName}_DeploymentGroup`, {
+            alias,
+            deploymentConfig: codedeploy.LambdaDeploymentConfig.ALL_AT_ONCE,
+        });
 
         // ApiGW
         const apigw = new apigateway.LambdaRestApi(this, `${config.appName}_APIGateway`, {
@@ -232,6 +245,7 @@ export class LaravelStack extends cdk.Stack {
             ],
             enableIpV6: true,
         });
+
         console.log('cloudfront');
         console.log(this.cloudfront);
         console.log('other stuff\n');
@@ -239,19 +253,5 @@ export class LaravelStack extends cdk.Stack {
 
         this.lambda.addEnvironment('AWS_URL', this.cloudfront.distributionDomainName);
         console.log(this.lambda);
-
-        // lambdaversion
-        const version = this.lambda.addVersion(new Date().toISOString());
-        const alias = new lambda.Alias(this, `${config.appName}_VersionAlias`, {
-            aliasName: 'Prod',
-            version,
-        });
-
-        // codedeploy
-        const temp = new codedeploy.LambdaDeploymentGroup(this, `${config.appName}_DeploymentGroup`, {
-            alias,
-            deploymentConfig: codedeploy.LambdaDeploymentConfig.ALL_AT_ONCE,
-        });
-
     }
 }
