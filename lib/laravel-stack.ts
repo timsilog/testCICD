@@ -9,10 +9,11 @@ import { Credentials } from '@aws-cdk/aws-rds';
 import * as path from "path";
 import * as s3 from "@aws-cdk/aws-s3";
 import * as efs from '@aws-cdk/aws-efs';
-import { LambdaApplication } from "@aws-cdk/aws-codedeploy";
+// import { LambdaApplication } from "@aws-cdk/aws-codedeploy";
 import config from '../config';
-import { Aws } from "@aws-cdk/core";
-import { load } from "ts-dotenv";
+// import { Aws } from "@aws-cdk/core";
+// import { load } from "ts-dotenv";
+
 
 // const env = load({
 //     APP_NAME: String,
@@ -99,6 +100,62 @@ export class LaravelStack extends cdk.Stack {
             },
         });
 
+        const environment: any = {
+            APP_NAME: 'Laravel',
+            APP_ENV: 's3',
+            APP_KEY: 'base64:lAVEpZv/OI1H7G/OgsDVRCVqD3eWILkmcMWjcIW4uoA=',
+            APP_DEBUG: 'true',
+            APP_URL: 'http://localhost',
+
+            LOG_CHANNEL: 'stack',
+
+            DB_CONNECTION: 'mysql',
+            DB_HOST: '127.0.0.1',
+            DB_PORT: '3306',
+            DB_DATABASE: 'laravel',
+            DB_USERNAME: 'root',
+            DB_PASSWORD: '',
+
+            // BROADCAST_DRIVER: 'log',
+            // CACHE_DRIVER: env.CACHE_DRIVER,
+            // QUEUE_CONNECTION: env.QUEUE_CONNECTION,
+            // SESSION_DRIVER: env.SESSION_DRIVER,
+            // SESSION_LIFETIME: env.SESSION_LIFETIME,
+
+            // REDIS_HOST: env.REDIS_HOST,
+            // REDIS_PASSWORD: env.REDIS_PASSWORD,
+            // REDIS_PORT: env.REDIS_PORT,
+
+            // MAIL_MAILER: env.MAIL_MAILER,
+            // MAIL_HOST: env.MAIL_HOST,
+            // MAIL_PORT: env.MAIL_PORT,
+            // MAIL_USERNAME: env.MAIL_USERNAME,
+            // MAIL_PASSWORD: env.MAIL_PASSWORD,
+            // MAIL_ENCRYPTION: env.MAIL_ENCRYPTION,
+            // MAIL_FROM_ADDRESS: env.MAIL_FROM_ADDRESS,
+            // MAIL_FROM_NAME: env.MAIL_FROM_NAME,
+
+            // AWS_ACCESS_KEY_ID: env.AWS_ACCESS_KEY_ID ? env.AWS_ACCESS_KEY_ID : '',
+            // AWS_SECRET_ACCESS_KEY: env.AWS_SECRET_ACCESS_KEY ? env.AWS_SECRET_ACCESS_KEY : '',
+            // AWS_DEFAULT_REGION: 'us-east-1',
+            AWS_BUCKET: props.s3.bucketName,
+            // AWS_URL: 'wrongurl',
+
+            // PUSHER_APP_ID: env.PUSHER_APP_ID ? env.PUSHER_APP_ID : '',
+            // PUSHER_APP_KEY: env.PUSHER_APP_KEY ? env.PUSHER_APP_KEY : '',
+            // PUSHER_APP_SECRET: env.PUSHER_APP_SECRET ? env.PUSHER_APP_SECRET : '',
+            // PUSHER_APP_CLUSTER: env.PUSHER_APP_CLUSTER,
+
+            // MIX_PUSHER_APP_KEY: env.MIX_PUSHER_APP_KEY,
+            // MIX_PUSHER_APP_CLUSTER: env.MIX_PUSHER_APP_CLUSTER,
+
+            WORDPRESS_DB_ENDPOINT: props.rdsEndpoint,
+            WORDPRESS_DB_PORT: props.rdsPort,
+            WORDPRESS_DB_NAME: props.rdsDb,
+            WORDPRESS_DB_USERNAME: props.rdsCredentials.username,
+            WORDPRESS_DB_PASSWORD: props.rdsCredentials.secret ? props.rdsCredentials.secret.toString() : '', // empty string might be wrong here
+        }
+
         this.lambda = new lambda.Function(this, `Laravel_Lambda`, {
             description: `Generated on: ${new Date().toISOString()}`,
             runtime: lambda.Runtime.PROVIDED,
@@ -130,63 +187,8 @@ export class LaravelStack extends cdk.Stack {
                     resourceName: 'php-74-fpm:11',
                 }, this)),
             ],
-            environment: {
-                APP_NAME: 'Laravel',
-                APP_ENV: 's3',
-                APP_KEY: 'base64:lAVEpZv/OI1H7G/OgsDVRCVqD3eWILkmcMWjcIW4uoA=',
-                APP_DEBUG: 'true',
-                APP_URL: 'http://localhost',
-
-                LOG_CHANNEL: 'stack',
-
-                DB_CONNECTION: 'mysql',
-                DB_HOST: '127.0.0.1',
-                DB_PORT: '3306',
-                DB_DATABASE: 'laravel',
-                DB_USERNAME: 'root',
-                DB_PASSWORD: '',
-
-                // BROADCAST_DRIVER: 'log',
-                // CACHE_DRIVER: env.CACHE_DRIVER,
-                // QUEUE_CONNECTION: env.QUEUE_CONNECTION,
-                // SESSION_DRIVER: env.SESSION_DRIVER,
-                // SESSION_LIFETIME: env.SESSION_LIFETIME,
-
-                // REDIS_HOST: env.REDIS_HOST,
-                // REDIS_PASSWORD: env.REDIS_PASSWORD,
-                // REDIS_PORT: env.REDIS_PORT,
-
-                // MAIL_MAILER: env.MAIL_MAILER,
-                // MAIL_HOST: env.MAIL_HOST,
-                // MAIL_PORT: env.MAIL_PORT,
-                // MAIL_USERNAME: env.MAIL_USERNAME,
-                // MAIL_PASSWORD: env.MAIL_PASSWORD,
-                // MAIL_ENCRYPTION: env.MAIL_ENCRYPTION,
-                // MAIL_FROM_ADDRESS: env.MAIL_FROM_ADDRESS,
-                // MAIL_FROM_NAME: env.MAIL_FROM_NAME,
-
-                // AWS_ACCESS_KEY_ID: env.AWS_ACCESS_KEY_ID ? env.AWS_ACCESS_KEY_ID : '',
-                // AWS_SECRET_ACCESS_KEY: env.AWS_SECRET_ACCESS_KEY ? env.AWS_SECRET_ACCESS_KEY : '',
-                // AWS_DEFAULT_REGION: 'us-east-1',
-                AWS_BUCKET: props.s3.bucketName,
-                // AWS_URL: 'wrongurl',
-
-                // PUSHER_APP_ID: env.PUSHER_APP_ID ? env.PUSHER_APP_ID : '',
-                // PUSHER_APP_KEY: env.PUSHER_APP_KEY ? env.PUSHER_APP_KEY : '',
-                // PUSHER_APP_SECRET: env.PUSHER_APP_SECRET ? env.PUSHER_APP_SECRET : '',
-                // PUSHER_APP_CLUSTER: env.PUSHER_APP_CLUSTER,
-
-                // MIX_PUSHER_APP_KEY: env.MIX_PUSHER_APP_KEY,
-                // MIX_PUSHER_APP_CLUSTER: env.MIX_PUSHER_APP_CLUSTER,
-
-                WORDPRESS_DB_ENDPOINT: props.rdsEndpoint,
-                WORDPRESS_DB_PORT: props.rdsPort,
-                WORDPRESS_DB_NAME: props.rdsDb,
-                WORDPRESS_DB_USERNAME: props.rdsCredentials.username,
-                WORDPRESS_DB_PASSWORD: props.rdsCredentials.secret ? props.rdsCredentials.secret.toString() : '', // empty string might be wrong here
-            },
+            environment
         });
-        console.log(this.lambda);
 
         // lambdaversion
         const version = this.lambda.addVersion(new Date().toISOString());
@@ -246,12 +248,11 @@ export class LaravelStack extends cdk.Stack {
             enableIpV6: true,
         });
 
-        // console.log('cloudfront');
-        // console.log(this.cloudfront);
-        // console.log('other stuff\n');
-        // console.log(this.cloudfront.distributionDomainName);
-
-        this.lambda.addEnvironment('TEST', 'test');
-        // console.log(this.lambda);
+        new cdk.CfnOutput(this, 'cfDomainName', {
+            value: this.cloudfront.distributionDomainName
+        });
+        new cdk.CfnOutput(this, 'functionName', {
+            value: this.lambda.functionName
+        });
     }
 }

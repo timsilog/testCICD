@@ -38,12 +38,11 @@ const laravelStack = new LaravelStack(app, 'Laravel', {
     rdsPort: rdsStack.mySQLRDSInstance.dbInstanceEndpointPort,
     rdsCredentials: rdsStack.credentials
 });
-
 new PipelineStack(app, 'Pipeline2', {
     s3: storageStack.S3Bucket,
     vpc: vpcStack.vpc,
     efs: storageStack.EFSInstance,
-    cloudfront: laravelStack.cloudfront,
+    // cloudfront: laravelStack.cloudfront,
     databaseAccessSecurityGroup: rdsStack.databaseAccessSecurityGroup,
     efsAccessSecurityGroup: storageStack.efsAccessSecurityGroup,
     egressSecurityGroup: vpcStack.egressSecurityGroup,
