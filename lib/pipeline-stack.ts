@@ -140,6 +140,7 @@ export class PipelineStack extends cdk.Stack {
                                 'lambda:GetFunction',
                                 'lambda:DeleteFunction',
                                 'lambda:UpdateFunctionCode',
+                                'lambda:GetFunctionConfiguration',
                                 'lambda:UpdateFunctionConfiguration',
                                 'lambda:ListVersionsByFunction',
                                 'lambda:PublishVersion',
