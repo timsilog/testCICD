@@ -10,9 +10,6 @@ STACK=`aws cloudformation describe-stacks \
 CF_URL=`echo $STACK | jq -rc '.[] | select(.OutputKey=="cfDomainName") | .OutputValue '`
 FUNCTION_NAME=`echo $STACK | jq -rc '.[] | select(.OutputKey=="functionName") | .OutputValue '`
 
-echo $CF_URL
-echo $FUNCTION_NAME
-
 ENV=`aws lambda get-function-configuration \
     --function-name ${FUNCTION_NAME} \
     --output json | jq -rc '.Environment'`
