@@ -9,7 +9,10 @@ function Example() {
                     <div className="card">
                         <div className="card-header">Example Component</div>
 
-                        <div className="card-body">I'm a react component from s3!</div>
+                        <div className="card-body">
+                            I'm a react component from s3!
+                            <button>I'm a button that does nothing</button>
+                        </div>
                     </div>
                 </div>
             </div>

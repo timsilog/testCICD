@@ -220,8 +220,11 @@ export class LaravelStack extends cdk.Stack {
                     },
                     behaviors: [
                         {
-                            pathPattern: "/public/assets/*"
+                            pathPattern: "js/*"
                         },
+                        {
+                            pathPattern: "css/*"
+                        }
                     ]
                 },
                 {

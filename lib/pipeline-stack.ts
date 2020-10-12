@@ -311,27 +311,3 @@ export class PipelineStack extends cdk.Stack {
         });
     }
 }
-
-
-/*
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Principal": {
-                "AWS": "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity E2QNWLAV38XU5H"
-            },
-            "Action": [
-                "s3:GetObject*",
-                "s3:GetBucket*",
-                "s3:List*"
-            ],
-            "Resource": [
-                "arn:aws:s3:::storage2-wordpresss3523c628c-wygk1521hwj1",
-                "arn:aws:s3:::storage2-wordpresss3523c628c-wygk1521hwj1/*"
-            ]
-        }
-    ]
-}
-*/
