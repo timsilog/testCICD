@@ -240,7 +240,10 @@ export class LaravelStack extends cdk.Stack {
                             cookies: {
                                 forward: 'all'
                             },
-                            headers: ['*']
+                            headers: [
+                                'Accept',
+                                'Content-Type'
+                            ]
                         },
                         minTtl: cdk.Duration.seconds(0),
                         maxTtl: cdk.Duration.seconds(0),
