@@ -79,7 +79,7 @@ export class LaravelStack extends Stack {
             MAIL_HOST: config.mailHost,
             MAIL_PORT: config.mailPort,
             MAIL_USERNAME: config.mailUsername,
-            MAIL_PASSWORD: config.mailPassword,
+            // MAIL_PASSWORD: config.mailPassword,
             MAIL_ENCRYPTION: config.mailEncryption,
             MAIL_FROM_ADDRESS: config.mailFromAddress,
             MAIL_FROM_NAME: config.mailFromName,
@@ -235,11 +235,6 @@ export class LaravelStack extends Stack {
                 batchSize: 10
             })
         )
-
-        console.log(queue.queueName);
-        console.log(queue.queueUrl);
-        console.log(queue.queueUrl.replace(queue.queueName, ""));
-
         // Add these to output for postbuild script to use
         new CfnOutput(this, 'env', {
             value: JSON.stringify({
