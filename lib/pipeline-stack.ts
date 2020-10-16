@@ -70,6 +70,17 @@ export class PipelineStack extends cdk.Stack {
             roleName: 'codeBuildUser2',
             assumedBy: codeBuildServicePrincipal,
             inlinePolicies: {
+                sqs: new PolicyDocument({
+                    statements: [
+                        new PolicyStatement({
+                            effect: Effect.ALLOW,
+                            resources: ['*'],
+                            actions: [
+                                'sqs:GetQueueAttributes'
+                            ]
+                        })
+                    ]
+                }),
                 cloudformations: new PolicyDocument({
                     statements: [
                         new PolicyStatement({

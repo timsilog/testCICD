@@ -235,6 +235,8 @@ export class LaravelStack extends Stack {
                 batchSize: 10
             })
         )
+
+
         // Add these to output for postbuild script to use
         new CfnOutput(this, 'env', {
             value: JSON.stringify({
