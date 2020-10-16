@@ -239,7 +239,7 @@ export class PipelineStack extends cdk.Stack {
                         commands: [
                             'npm run build',
                             `aws s3 sync laravel/public/assets s3://${props.s3.bucketName} --exclude *.php`,
-                            "cdk deploy Laravel --exclusively",
+                            "cdk deploy Laravel --exclusively --outputs-file cdkOutput.json",
                             'ls',
                             "sh updateCfUrl.sh"
                         ]

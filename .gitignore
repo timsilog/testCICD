@@ -26,3 +26,9 @@ node_modules
 # CDK asset staging directory
 .cdk.staging
 cdk.out
+
+# other
+cdkOutput.json
+deleteme.sh
+env.json
+temp.sh

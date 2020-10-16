@@ -1,4 +1,4 @@
-import * as cdk from "@aws-cdk/core";
+import { StackProps, Stack, Construct, Arn, Duration, CfnOutput } from "@aws-cdk/core";
 import * as lambda from "@aws-cdk/aws-lambda";
 import * as codedeploy from "@aws-cdk/aws-codedeploy";
 import * as apigateway from "@aws-cdk/aws-apigateway";
@@ -9,62 +9,11 @@ import { Credentials } from '@aws-cdk/aws-rds';
 import * as path from "path";
 import * as s3 from "@aws-cdk/aws-s3";
 import * as efs from '@aws-cdk/aws-efs';
-// import { LambdaApplication } from "@aws-cdk/aws-codedeploy";
+import { Queue } from '@aws-cdk/aws-sqs';
+import { SqsEventSource } from "@aws-cdk/aws-lambda-event-sources";
 import config from '../config';
-// import { Aws } from "@aws-cdk/core";
-// import { load } from "ts-dotenv";
 
-
-// const env = load({
-//     APP_NAME: String,
-//     APP_ENV: String,
-//     APP_KEY: String,
-//     APP_DEBUG: String,
-//     APP_URL: String,
-
-//     LOG_CHANNEL: String,
-
-//     DB_CONNECTION: String,
-//     DB_HOST: String,
-//     DB_PORT: String,
-//     DB_DATABASE: String,
-//     DB_USERNAME: String,
-//     // DB_PASSWORD: String,
-
-//     BROADCAST_DRIVER: String,
-//     CACHE_DRIVER: String,
-//     QUEUE_CONNECTION: String,
-//     SESSION_DRIVER: String,
-//     SESSION_LIFETIME: String,
-
-//     REDIS_HOST: String,
-//     REDIS_PASSWORD: String,
-//     REDIS_PORT: String,
-
-//     MAIL_MAILER: String,
-//     MAIL_HOST: String,
-//     MAIL_PORT: String,
-//     MAIL_USERNAME: String,
-//     MAIL_PASSWORD: String,
-//     MAIL_ENCRYPTION: String,
-//     MAIL_FROM_ADDRESS: String,
-//     MAIL_FROM_NAME: String,
-
-//     // AWS_ACCESS_KEY_ID: String,
-//     // AWS_SECRET_ACCESS_KEY: String,
-//     AWS_DEFAULT_REGION: String,
-//     AWS_BUCKET: String,
-//     AWS_URL: String,
-
-//     // PUSHER_APP_ID: String,
-//     // PUSHER_APP_KEY: String,
-//     // PUSHER_APP_SECRET: String,
-//     // PUSHER_APP_CLUSTER: String,
-//     // MIX_PUSHER_APP_KEY: String,
-//     // MIX_PUSHER_APP_CLUSTER: String,
-// });
-
-interface ApplicationStackProps extends cdk.StackProps {
+interface ApplicationStackProps extends StackProps {
     vpc: Vpc;
     databaseAccessSecurityGroup: SecurityGroup
     efsAccessSecurityGroup: SecurityGroup
@@ -77,11 +26,11 @@ interface ApplicationStackProps extends cdk.StackProps {
     oai: OriginAccessIdentity
 }
 
-export class LaravelStack extends cdk.Stack {
+export class LaravelStack extends Stack {
     readonly lambda: lambda.Function;
     readonly cloudfront: CloudFrontWebDistribution;
 
-    constructor(scope: cdk.Construct, id: string, props: ApplicationStackProps) {
+    constructor(scope: Construct, id: string, props: ApplicationStackProps) {
         super(scope, id, props);
 
         // create a new access point from the filesystem
@@ -101,13 +50,13 @@ export class LaravelStack extends cdk.Stack {
         });
 
         const environment: any = {
-            APP_NAME: 'Laravel',
-            APP_ENV: 's3',
-            APP_KEY: 'base64:lAVEpZv/OI1H7G/OgsDVRCVqD3eWILkmcMWjcIW4uoA=',
-            APP_DEBUG: 'true',
-            APP_URL: 'http://localhost',
+            APP_NAME: config.appName,
+            APP_ENV: config.appEnv,
+            APP_KEY: config.appKey,
+            APP_DEBUG: config.appDebug,
+            APP_URL: config.appUrl,
 
-            LOG_CHANNEL: 'stack',
+            // LOG_CHANNEL: 'stack', // do i need this?
 
             DB_CONNECTION: 'mysql',
             DB_HOST: '127.0.0.1',
@@ -126,20 +75,28 @@ export class LaravelStack extends cdk.Stack {
             // REDIS_PASSWORD: env.REDIS_PASSWORD,
             // REDIS_PORT: env.REDIS_PORT,
 
-            // MAIL_MAILER: env.MAIL_MAILER,
-            // MAIL_HOST: env.MAIL_HOST,
-            // MAIL_PORT: env.MAIL_PORT,
-            // MAIL_USERNAME: env.MAIL_USERNAME,
-            // MAIL_PASSWORD: env.MAIL_PASSWORD,
-            // MAIL_ENCRYPTION: env.MAIL_ENCRYPTION,
-            // MAIL_FROM_ADDRESS: env.MAIL_FROM_ADDRESS,
-            // MAIL_FROM_NAME: env.MAIL_FROM_NAME,
+            MAIL_MAILER: config.mailMailer,
+            MAIL_HOST: config.mailHost,
+            MAIL_PORT: config.mailPort,
+            MAIL_USERNAME: config.mailUsername,
+            MAIL_PASSWORD: config.mailPassword,
+            MAIL_ENCRYPTION: config.mailEncryption,
+            MAIL_FROM_ADDRESS: config.mailFromAddress,
+            MAIL_FROM_NAME: config.mailFromName,
 
-            // AWS_ACCESS_KEY_ID: env.AWS_ACCESS_KEY_ID ? env.AWS_ACCESS_KEY_ID : '',
-            // AWS_SECRET_ACCESS_KEY: env.AWS_SECRET_ACCESS_KEY ? env.AWS_SECRET_ACCESS_KEY : '',
-            // AWS_DEFAULT_REGION: 'us-east-1',
+            // AWS_ACCESS_KEY_ID: provided by lambda
+            // AWS_SECRET_ACCESS_KEY: provided by lambda
+            // AWS_DEFAULT_REGION: 
             AWS_BUCKET: props.s3.bucketName,
-            // AWS_URL: 'wrongurl',
+            // AWS_URL: provided by post build script
+
+            QUEUE_CONNECTION: config.queueConnection,
+            // SQS_KEY:
+            // SQS_SECRET:
+            // SQS_QUEUE: Provided by post build script
+            // SQS_REGION: Provided by post build script
+            // SQS_PREFIX: Provided by post build script
+
 
             // PUSHER_APP_ID: env.PUSHER_APP_ID ? env.PUSHER_APP_ID : '',
             // PUSHER_APP_KEY: env.PUSHER_APP_KEY ? env.PUSHER_APP_KEY : '',
@@ -149,6 +106,7 @@ export class LaravelStack extends cdk.Stack {
             // MIX_PUSHER_APP_KEY: env.MIX_PUSHER_APP_KEY,
             // MIX_PUSHER_APP_CLUSTER: env.MIX_PUSHER_APP_CLUSTER,
 
+            // remove this
             WORDPRESS_DB_ENDPOINT: props.rdsEndpoint,
             WORDPRESS_DB_PORT: props.rdsPort,
             WORDPRESS_DB_NAME: props.rdsDb,
@@ -156,11 +114,11 @@ export class LaravelStack extends cdk.Stack {
             WORDPRESS_DB_PASSWORD: props.rdsCredentials.secret ? props.rdsCredentials.secret.toString() : '', // empty string might be wrong here
         }
 
-        this.lambda = new lambda.Function(this, `Laravel_Lambda`, {
+        this.lambda = new lambda.Function(this, `${config.appName}_Lambda`, {
             description: `Generated on: ${new Date().toISOString()}`,
             runtime: lambda.Runtime.PROVIDED,
             handler: 'public/index.php',
-            code: lambda.Code.fromAsset(path.resolve(__dirname, `../laravel`), {
+            code: lambda.Code.fromAsset(path.resolve(__dirname, `../${config.appDir}`), {
                 exclude: [
                     'node_modules/**',
                     'node_modules/.bin/**',
@@ -171,14 +129,14 @@ export class LaravelStack extends cdk.Stack {
                     'tests/**',
                 ]
             }),
-            timeout: cdk.Duration.seconds(28),
+            timeout: Duration.seconds(28),
             memorySize: 1024,
             vpc: props.vpc,
             vpcSubnets: { subnetType: SubnetType.PRIVATE },
             filesystem: lambda.FileSystem.fromEfsAccessPoint(accessPoint, '/mnt/efs'),
             securityGroups: [props.databaseAccessSecurityGroup, props.efsAccessSecurityGroup],
             layers: [
-                lambda.LayerVersion.fromLayerVersionArn(this, 'php-74-fpm', cdk.Arn.format({
+                lambda.LayerVersion.fromLayerVersionArn(this, 'php-74-fpm', Arn.format({
                     partition: 'aws',
                     service: 'lambda',
                     account: '209497400698', // the bref.sh account
@@ -245,19 +203,52 @@ export class LaravelStack extends cdk.Stack {
                                 'Content-Type'
                             ]
                         },
-                        minTtl: cdk.Duration.seconds(0),
-                        maxTtl: cdk.Duration.seconds(0),
-                        defaultTtl: cdk.Duration.seconds(0),
+                        minTtl: Duration.seconds(0),
+                        maxTtl: Duration.seconds(0),
+                        defaultTtl: Duration.seconds(0),
                     }]
                 }
             ],
             enableIpV6: true,
         });
 
-        new cdk.CfnOutput(this, 'cfDomainName', {
-            value: this.cloudfront.distributionDomainName
+        // Send msq to deadletter queue if it doesn't know what to do with a msg
+        const deadLetterQueue = new Queue(this, `${config.appName}_Deadletter_Queue`, {
+            queueName: `${config.appName}_deadletter_queue`,
+            retentionPeriod: Duration.days(14),
         });
-        new cdk.CfnOutput(this, 'functionName', {
+
+        const queue = new Queue(this, `${config.appName}_Queue`, {
+            queueName: `${config.appName}_queue`,
+            deadLetterQueue: {
+                maxReceiveCount: 1,
+                queue: deadLetterQueue
+            }
+        });
+
+        // todo: grant send messages to deadletter queue too
+        queue.grantConsumeMessages(this.lambda);
+        queue.grantSendMessages(this.lambda);
+
+        this.lambda.addEventSource(
+            new SqsEventSource(queue, {
+                batchSize: 10
+            })
+        )
+
+        console.log(queue.queueName);
+        console.log(queue.queueUrl);
+        console.log(queue.queueUrl.replace(queue.queueName, ""));
+
+        // Add these to output for postbuild script to use
+        new CfnOutput(this, 'env', {
+            value: JSON.stringify({
+                AWS_URL: this.cloudfront.distributionDomainName,
+                SQS_QUEUE: queue.queueName,
+                SQS_PREFIX: queue.queueUrl.replace(queue.queueName, '')
+            })
+        });
+        new CfnOutput(this, 'functionName', {
             value: this.lambda.functionName
         });
     }

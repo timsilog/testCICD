@@ -3,6 +3,10 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+use App\Jobs\SendEmail;
+
+
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -22,4 +26,14 @@ Route::get('test', function () {
     // If the Content-Type and Accept headers are set to 'application/json', 
     // this will return a JSON structure. This will be cleaned up later.
     return "Hello World from Tim";
+});
+
+Route::post('send', function (Request $request) {
+    $email = $request->input('email');
+    SendEmail::dispatch($email);
+    return $request->input('email');
+});
+
+Route::post('hello', function () {
+    return "Hello this works";
 });
