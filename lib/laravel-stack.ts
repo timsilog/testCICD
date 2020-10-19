@@ -151,13 +151,13 @@ export class LaravelStack extends Stack {
             filesystem: FileSystem.fromEfsAccessPoint(accessPoint, '/mnt/efs'),
             securityGroups: [props.databaseAccessSecurityGroup, props.efsAccessSecurityGroup],
             layers: [
-                LayerVersion.fromLayerVersionArn(this, 'php-74-fpm-2', Arn.format({
+                LayerVersion.fromLayerVersionArn(this, 'php-74', Arn.format({
                     partition: 'aws',
                     service: 'lambda',
                     account: '209497400698', // the bref.sh account
                     resource: 'layer',
                     sep: ':',
-                    resourceName: 'php-74-fpm:11',
+                    resourceName: 'php-74:14',
                 }, this)),
             ],
             environment
@@ -262,8 +262,11 @@ export class LaravelStack extends Stack {
                 SQS_PREFIX: queue.queueUrl.replace(queue.queueName, '')
             })
         });
-        new CfnOutput(this, 'functionName', {
+        new CfnOutput(this, 'httpFunctionName', {
             value: this.lambdaHttp.functionName
+        });
+        new CfnOutput(this, 'workerFunctionName', {
+            value: this.lambdaWorker.functionName
         });
     }
 }

@@ -15,19 +15,28 @@
 ## Using a provided json file
 JSON_FILE="cdkOutput.json"
 OUTPUT_FILE="env.json"
-FUNCTION_NAME=`jq -r ".Laravel.functionName" $JSON_FILE`
+HTTP_FUNCTION_NAME=`jq -r ".Laravel.httpFunctionName" $JSON_FILE`
+WORKER_FUNCTION_NAME=`jq -r ".Laravel.workerFunctionName" $JSON_FILE`
 
 # Remove queue name from prefix
 SQS_PREFIX=`jq -r ".Laravel.env | fromjson | .SQS_PREFIX" $JSON_FILE`
 echo `jq --arg newPrefix ${SQS_PREFIX%/*} '.Laravel.env | fromjson | .SQS_PREFIX = $newPrefix' $JSON_FILE` > $OUTPUT_FILE
 
 # Get current lambda env variables then merge new ones in
-ENV=`aws lambda get-function-configuration \
-    --function-name ${FUNCTION_NAME} \
+HTTP_ENV=`aws lambda get-function-configuration \
+    --function-name ${HTTP_FUNCTION_NAME} \
     --output json | jq -rc '.Environment'`
-COMBINED=`jq ". + ${ENV}.Variables" $OUTPUT_FILE`
+WORKER_ENV=`aws lambda get-function-configuration \
+    --function-name ${WORKER_FUNCTION_NAME} \
+    --output json | jq -rc '.Environment'`    
+HTTP_COMBINED=`jq ". + ${HTTP_ENV}.Variables" $OUTPUT_FILE`
+HTTP_COMBINED=`jq ". + ${WORKER_ENV}.Variables" $OUTPUT_FILE`
 
 # Write new env variables to the lambda function
 aws lambda update-function-configuration \
-    --function-name  $FUNCTION_NAME \
-    --environment "{\"Variables\": $COMBINED}"
+    --function-name  $HTTP_FUNCTION_NAME \
+    --environment "{\"Variables\": $HTTP_COMBINED}"
+
+aws lambda update-function-configuration \
+    --function-name  $WORKER_FUNCTION_NAME \
+    --environment "{\"Variables\": $WORKER_COMBINED}"
