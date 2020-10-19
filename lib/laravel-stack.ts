@@ -1,5 +1,5 @@
 import { StackProps, Stack, Construct, Arn, Duration, CfnOutput } from "@aws-cdk/core";
-import * as lambda from "@aws-cdk/aws-lambda";
+import { Function, Code, FileSystem, LayerVersion, Runtime, Alias } from "@aws-cdk/aws-lambda";
 import * as codedeploy from "@aws-cdk/aws-codedeploy";
 import * as apigateway from "@aws-cdk/aws-apigateway";
 import { CloudFrontWebDistribution, OriginAccessIdentity, CloudFrontAllowedMethods } from "@aws-cdk/aws-cloudfront"
@@ -27,7 +27,8 @@ interface ApplicationStackProps extends StackProps {
 }
 
 export class LaravelStack extends Stack {
-    readonly lambda: lambda.Function;
+    readonly lambdaHttp: Function;
+    readonly lambdaWorker: Function;
     readonly cloudfront: CloudFrontWebDistribution;
 
     constructor(scope: Construct, id: string, props: ApplicationStackProps) {
@@ -56,24 +57,12 @@ export class LaravelStack extends Stack {
             APP_DEBUG: config.appDebug,
             APP_URL: config.appUrl,
 
-            // LOG_CHANNEL: 'stack', // do i need this?
-
             DB_CONNECTION: 'mysql',
             DB_HOST: '127.0.0.1',
             DB_PORT: '3306',
             DB_DATABASE: 'laravel',
             DB_USERNAME: 'root',
             DB_PASSWORD: '',
-
-            // BROADCAST_DRIVER: 'log',
-            // CACHE_DRIVER: env.CACHE_DRIVER,
-            // QUEUE_CONNECTION: env.QUEUE_CONNECTION,
-            // SESSION_DRIVER: env.SESSION_DRIVER,
-            // SESSION_LIFETIME: env.SESSION_LIFETIME,
-
-            // REDIS_HOST: env.REDIS_HOST,
-            // REDIS_PASSWORD: env.REDIS_PASSWORD,
-            // REDIS_PORT: env.REDIS_PORT,
 
             MAIL_MAILER: config.mailMailer,
             MAIL_HOST: config.mailHost,
@@ -98,14 +87,6 @@ export class LaravelStack extends Stack {
             // SQS_PREFIX: Provided by post build script
 
 
-            // PUSHER_APP_ID: env.PUSHER_APP_ID ? env.PUSHER_APP_ID : '',
-            // PUSHER_APP_KEY: env.PUSHER_APP_KEY ? env.PUSHER_APP_KEY : '',
-            // PUSHER_APP_SECRET: env.PUSHER_APP_SECRET ? env.PUSHER_APP_SECRET : '',
-            // PUSHER_APP_CLUSTER: env.PUSHER_APP_CLUSTER,
-
-            // MIX_PUSHER_APP_KEY: env.MIX_PUSHER_APP_KEY,
-            // MIX_PUSHER_APP_CLUSTER: env.MIX_PUSHER_APP_CLUSTER,
-
             // remove this
             WORDPRESS_DB_ENDPOINT: props.rdsEndpoint,
             WORDPRESS_DB_PORT: props.rdsPort,
@@ -114,11 +95,11 @@ export class LaravelStack extends Stack {
             WORDPRESS_DB_PASSWORD: props.rdsCredentials.secret ? props.rdsCredentials.secret.toString() : '', // empty string might be wrong here
         }
 
-        this.lambda = new lambda.Function(this, `${config.appName}_Lambda`, {
+        this.lambdaHttp = new Function(this, `${config.appName}_Lambda`, {
             description: `Generated on: ${new Date().toISOString()}`,
-            runtime: lambda.Runtime.PROVIDED,
+            runtime: Runtime.PROVIDED,
             handler: 'public/index.php',
-            code: lambda.Code.fromAsset(path.resolve(__dirname, `../${config.appDir}`), {
+            code: Code.fromAsset(path.resolve(__dirname, `../${config.appDir}`), {
                 exclude: [
                     'node_modules/**',
                     'node_modules/.bin/**',
@@ -133,10 +114,44 @@ export class LaravelStack extends Stack {
             memorySize: 1024,
             vpc: props.vpc,
             vpcSubnets: { subnetType: SubnetType.PRIVATE },
-            filesystem: lambda.FileSystem.fromEfsAccessPoint(accessPoint, '/mnt/efs'),
+            filesystem: FileSystem.fromEfsAccessPoint(accessPoint, '/mnt/efs'),
             securityGroups: [props.databaseAccessSecurityGroup, props.efsAccessSecurityGroup],
             layers: [
-                lambda.LayerVersion.fromLayerVersionArn(this, 'php-74-fpm', Arn.format({
+                LayerVersion.fromLayerVersionArn(this, 'php-74-fpm', Arn.format({
+                    partition: 'aws',
+                    service: 'lambda',
+                    account: '209497400698', // the bref.sh account
+                    resource: 'layer',
+                    sep: ':',
+                    resourceName: 'php-74-fpm:11',
+                }, this)),
+            ],
+            environment
+        });
+
+        this.lambdaWorker = new Function(this, `${config.appName}_Lambda_Worker`, {
+            description: `Worker for SQS. Generated on: ${new Date().toISOString()}`,
+            runtime: Runtime.PROVIDED,
+            handler: 'worker.php',
+            code: Code.fromAsset(path.resolve(__dirname, `../${config.appDir}`), {
+                exclude: [
+                    'node_modules/**',
+                    'node_modules/.bin/**',
+                    'public/assets/**',
+                    'public/storage/**',
+                    'resources/assets/**',
+                    'storage/**',
+                    'tests/**',
+                ]
+            }),
+            timeout: Duration.seconds(900), // 900 is max; 15 mins
+            memorySize: 1024,
+            vpc: props.vpc,
+            vpcSubnets: { subnetType: SubnetType.PRIVATE },
+            filesystem: FileSystem.fromEfsAccessPoint(accessPoint, '/mnt/efs'),
+            securityGroups: [props.databaseAccessSecurityGroup, props.efsAccessSecurityGroup],
+            layers: [
+                LayerVersion.fromLayerVersionArn(this, 'php-74-fpm-2', Arn.format({
                     partition: 'aws',
                     service: 'lambda',
                     account: '209497400698', // the bref.sh account
@@ -149,8 +164,8 @@ export class LaravelStack extends Stack {
         });
 
         // lambdaversion
-        const version = this.lambda.addVersion(new Date().toISOString());
-        const alias = new lambda.Alias(this, `${config.appName}_VersionAlias`, {
+        const version = this.lambdaHttp.addVersion(new Date().toISOString());
+        const alias = new Alias(this, `${config.appName}_VersionAlias`, {
             aliasName: 'Prod',
             version,
         });
@@ -163,7 +178,7 @@ export class LaravelStack extends Stack {
 
         // ApiGW
         const apigw = new apigateway.LambdaRestApi(this, `${config.appName}_APIGateway`, {
-            handler: this.lambda,
+            handler: this.lambdaHttp,
             proxy: true
         });
 
@@ -215,11 +230,13 @@ export class LaravelStack extends Stack {
         // Send msq to deadletter queue if it doesn't know what to do with a msg
         const deadLetterQueue = new Queue(this, `${config.appName}_Deadletter_Queue`, {
             queueName: `${config.appName}_deadletter_queue`,
+            visibilityTimeout: Duration.seconds(900),
             retentionPeriod: Duration.days(14),
         });
 
         const queue = new Queue(this, `${config.appName}_Queue`, {
             queueName: `${config.appName}_queue`,
+            visibilityTimeout: Duration.seconds(900),
             deadLetterQueue: {
                 maxReceiveCount: 1,
                 queue: deadLetterQueue
@@ -227,10 +244,10 @@ export class LaravelStack extends Stack {
         });
 
         // todo: grant send messages to deadletter queue too
-        queue.grantConsumeMessages(this.lambda);
-        queue.grantSendMessages(this.lambda);
+        queue.grantConsumeMessages(this.lambdaWorker);
+        queue.grantSendMessages(this.lambdaHttp);
 
-        this.lambda.addEventSource(
+        this.lambdaWorker.addEventSource(
             new SqsEventSource(queue, {
                 batchSize: 10
             })
@@ -246,7 +263,7 @@ export class LaravelStack extends Stack {
             })
         });
         new CfnOutput(this, 'functionName', {
-            value: this.lambda.functionName
+            value: this.lambdaHttp.functionName
         });
     }
 }
