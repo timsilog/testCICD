@@ -31,7 +31,6 @@ WORKER_ENV=`aws lambda get-function-configuration \
     --output json | jq -rc '.Environment'`    
 HTTP_COMBINED=`jq ". + ${HTTP_ENV}.Variables" $OUTPUT_FILE`
 WORKER_COMBINED=`jq ". + ${WORKER_ENV}.Variables" $OUTPUT_FILE`
-
 # Write new env variables to the lambda function
 aws lambda update-function-configuration \
     --function-name  $HTTP_FUNCTION_NAME \

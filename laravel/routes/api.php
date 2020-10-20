@@ -30,8 +30,8 @@ Route::get('test', function () {
 
 Route::post('send', function (Request $request) {
     $email = $request->input('email');
-    // SendEmail::dispatch($email);
-    return $request->input('email');
+    SendEmail::dispatch($email);
+    return $email;
 });
 
 Route::post('hello', function () {
