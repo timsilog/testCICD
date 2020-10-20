@@ -110,7 +110,7 @@ export class LaravelStack extends Stack {
                     'tests/**',
                 ]
             }),
-            timeout: Duration.seconds(28),
+            timeout: Duration.seconds(60),
             memorySize: 1024,
             vpc: props.vpc,
             vpcSubnets: { subnetType: SubnetType.PRIVATE },
