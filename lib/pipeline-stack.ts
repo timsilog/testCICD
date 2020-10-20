@@ -244,11 +244,6 @@ export class PipelineStack extends cdk.Stack {
                         commands: [
                             'npm i -g aws-cdk',
                             'npm i',
-                            'cd laravel && ls',
-                            // 'cd laravel && npm run prod',
-                            'pwd',
-                            'ls',
-                            'cd ../',
                         ]
                     },
                     build: {
