@@ -10,7 +10,6 @@ declare const config: {
     mailHost: string;
     mailPort: string;
     mailUsername: string;
-    mailPassword: string;
     mailEncryption: string;
     mailFromAddress: string;
     mailFromName: string;

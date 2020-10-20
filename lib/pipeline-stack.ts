@@ -201,7 +201,11 @@ export class PipelineStack extends cdk.Stack {
                     },
                     build: {
                         commands: [
-                            'npm run prod && cd ../',
+                            'npm run prod',
+                            'php artisan cache:clear',
+                            'php artisan config:cache',
+                            'php artisan config:clear',
+                            'cd ../',
                         ]
                     },
                 },
@@ -249,9 +253,6 @@ export class PipelineStack extends cdk.Stack {
                     build: {
                         commands: [
                             'npm run build',
-                            'php artisan cache:clear',
-                            'php artisan config:cache',
-                            'php artisan config:clear',
                             `aws s3 sync laravel/public/assets s3://${props.s3.bucketName} --exclude *.php`,
                             "cdk deploy Laravel --exclusively --outputs-file cdkOutput.json",
                             "sh updateLambdaEnv.sh"
