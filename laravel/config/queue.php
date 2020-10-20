@@ -57,7 +57,7 @@ return [
             'queue' => env('SQS_QUEUE', 'your-queue-name'),
             'suffix' => env('SQS_SUFFIX'),
             'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
-            // 'token' => env('AWS_SESSION_TOKEN'), // bref says we need this
+            'token' => env('AWS_SESSION_TOKEN'), // bref says we need this
         ],
 
         'redis' => [
