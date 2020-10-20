@@ -117,14 +117,7 @@ export class LaravelStack extends Stack {
             filesystem: FileSystem.fromEfsAccessPoint(accessPoint, '/mnt/efs'),
             securityGroups: [props.databaseAccessSecurityGroup, props.efsAccessSecurityGroup],
             layers: [
-                LayerVersion.fromLayerVersionArn(this, 'php-74-fpm', Arn.format({
-                    partition: 'aws',
-                    service: 'lambda',
-                    account: '209497400698', // the bref.sh account
-                    resource: 'layer',
-                    sep: ':',
-                    resourceName: 'php-74-fpm:11',
-                }, this)),
+                LayerVersion.fromLayerVersionArn(this, 'php-74-fpm', 'arn:aws:lambda:us-east-1:209497400698:layer:php-74-fpm:14'),
             ],
             environment
         });
