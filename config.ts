@@ -10,7 +10,7 @@ const config = {
     mailHost: 'smtp.mailtrap.io',
     mailPort: '2525',
     mailUsername: 'f847b74fc9aaff',
-    mailEncryption: 'tls',
+    mailEncryption: 'null',
     mailFromAddress: 'test@test.com',
     mailFromName: 'Laravel',
     queueConnection: 'sqs',
