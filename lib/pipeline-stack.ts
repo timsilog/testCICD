@@ -157,7 +157,8 @@ export class PipelineStack extends cdk.Stack {
                                 'lambda:PublishVersion',
                                 'lambda:UpdateAlias',
                                 'lambda:GetAlias',
-                                'lambda:GetProvisionedConcurrencyConfig'
+                                'lambda:GetProvisionedConcurrencyConfig',
+                                'lambda:GetLayerVersion'
                             ]
                         })
                     ]
