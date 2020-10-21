@@ -14,16 +14,17 @@ import { SqsEventSource } from "@aws-cdk/aws-lambda-event-sources";
 import config from '../config';
 
 interface ApplicationStackProps extends StackProps {
-    vpc: Vpc;
-    databaseAccessSecurityGroup: SecurityGroup
-    efsAccessSecurityGroup: SecurityGroup
-    rdsEndpoint: string
-    rdsDb: string
+    vpc: Vpc,
+    databaseAccessSecurityGroup: SecurityGroup,
+    efsAccessSecurityGroup: SecurityGroup,
+    egressSecurityGroup: SecurityGroup,
+    rdsEndpoint: string,
+    rdsDb: string,
     rdsPort: string,
     rdsCredentials: Credentials,
-    efs: efs.FileSystem
-    s3: s3.Bucket
-    oai: OriginAccessIdentity
+    efs: efs.FileSystem,
+    s3: s3.Bucket,
+    oai: OriginAccessIdentity,
 }
 
 export class LaravelStack extends Stack {
@@ -115,7 +116,7 @@ export class LaravelStack extends Stack {
             vpc: props.vpc,
             vpcSubnets: { subnetType: SubnetType.PRIVATE },
             filesystem: FileSystem.fromEfsAccessPoint(accessPoint, '/mnt/efs'),
-            securityGroups: [props.databaseAccessSecurityGroup, props.efsAccessSecurityGroup],
+            securityGroups: [props.databaseAccessSecurityGroup, props.efsAccessSecurityGroup, props.egressSecurityGroup],
             layers: [
                 LayerVersion.fromLayerVersionArn(this, 'php-74-fpm', 'arn:aws:lambda:us-east-1:209497400698:layer:php-74-fpm:14'),
             ],
@@ -142,7 +143,7 @@ export class LaravelStack extends Stack {
             vpc: props.vpc,
             vpcSubnets: { subnetType: SubnetType.PRIVATE },
             filesystem: FileSystem.fromEfsAccessPoint(accessPoint, '/mnt/efs'),
-            securityGroups: [props.databaseAccessSecurityGroup, props.efsAccessSecurityGroup],
+            securityGroups: [props.databaseAccessSecurityGroup, props.efsAccessSecurityGroup, props.egressSecurityGroup],
             layers: [
                 LayerVersion.fromLayerVersionArn(this, 'php-74-fpm:14', Arn.format({
                     partition: 'aws',
@@ -246,10 +247,10 @@ export class LaravelStack extends Stack {
             })
         )
 
-        const sqsEndpoint = props.vpc.addInterfaceEndpoint('sqs-gateway', {
-            service: InterfaceVpcEndpointAwsService.SQS,
-        });
-        sqsEndpoint.connections.allowDefaultPortFrom(this.lambdaHttp);
+        // const sqsEndpoint = props.vpc.addInterfaceEndpoint('sqs-gateway', {
+        //     service: InterfaceVpcEndpointAwsService.SQS,
+        // });
+        // sqsEndpoint.connections.allowDefaultPortFrom(this.lambdaHttp);
 
         // Add these to output for postbuild script to use
         new CfnOutput(this, 'env', {

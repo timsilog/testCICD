@@ -33,6 +33,7 @@ const laravelStack = new LaravelStack(app, 'Laravel', {
     oai: storageStack.OAI,
     databaseAccessSecurityGroup: rdsStack.databaseAccessSecurityGroup,
     efsAccessSecurityGroup: storageStack.efsAccessSecurityGroup,
+    egressSecurityGroup: vpcStack.egressSecurityGroup,
     rdsEndpoint: rdsStack.mySQLRDSInstance.dbInstanceEndpointAddress,
     rdsDb: rdsStack.database,
     rdsPort: rdsStack.mySQLRDSInstance.dbInstanceEndpointPort,
