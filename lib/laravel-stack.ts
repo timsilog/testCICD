@@ -256,7 +256,7 @@ export class LaravelStack extends Stack {
         new CfnOutput(this, 'env', {
             value: JSON.stringify({
                 AWS_URL: this.cloudfront.distributionDomainName,
-                SQS_QUEUE: queue.queueName,
+                SQS_QUEUE: queue.queueUrl,
                 SQS_PREFIX: queue.queueUrl.replace(queue.queueName, '')
             })
         });
