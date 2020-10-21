@@ -106,6 +106,17 @@ export class PipelineStack extends cdk.Stack {
                         }),
                     ]
                 }),
+                efs: new PolicyDocument({
+                    statements: [
+                        new PolicyStatement({
+                            effect: Effect.ALLOW,
+                            resources: ['*'],
+                            actions: [
+                                'elasticfilesystem:DescribeMountTargets'
+                            ]
+                        })
+                    ]
+                }),
                 rds: new PolicyDocument({
                     statements: [
                         new PolicyStatement({
