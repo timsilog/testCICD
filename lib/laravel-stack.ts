@@ -4,7 +4,7 @@ import * as codedeploy from "@aws-cdk/aws-codedeploy";
 import * as apigateway from "@aws-cdk/aws-apigateway";
 import { CloudFrontWebDistribution, OriginAccessIdentity, CloudFrontAllowedMethods } from "@aws-cdk/aws-cloudfront"
 import { ISecret } from '@aws-cdk/aws-secretsmanager';
-import { InterfaceVpcEndpointAwsService, Peer, Port, SecurityGroup, SubnetType, Vpc } from '@aws-cdk/aws-ec2'
+import { Peer, Port, SecurityGroup, SubnetType, Vpc } from '@aws-cdk/aws-ec2'
 import { Credentials } from '@aws-cdk/aws-rds';
 import * as path from "path";
 import * as s3 from "@aws-cdk/aws-s3";
@@ -96,6 +96,7 @@ export class LaravelStack extends Stack {
             WORDPRESS_DB_PASSWORD: props.rdsCredentials.secret ? props.rdsCredentials.secret.toString() : '', // empty string might be wrong here
         }
 
+        // Use https://runtimes.bref.sh/ for latest layerversion arn
         this.lambdaHttp = new Function(this, `${config.appName}_Lambda`, {
             description: `Generated on: ${new Date().toISOString()}`,
             runtime: Runtime.PROVIDED,
@@ -246,11 +247,6 @@ export class LaravelStack extends Stack {
                 batchSize: 10
             })
         )
-
-        // const sqsEndpoint = props.vpc.addInterfaceEndpoint('sqs-gateway', {
-        //     service: InterfaceVpcEndpointAwsService.SQS,
-        // });
-        // sqsEndpoint.connections.allowDefaultPortFrom(this.lambdaHttp);
 
         // Add these to output for postbuild script to use
         new CfnOutput(this, 'env', {
