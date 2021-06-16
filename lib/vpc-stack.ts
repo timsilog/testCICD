@@ -40,6 +40,8 @@ export class VpcStack extends Stack {
         sqsEndpoint.connections.allowDefaultPortFromAnyIpv4();
 
         // SES (there's no static member yet. taken from https://github.com/aws/aws-cdk/issues/9386)
+        // Gives: The VPC endpoint service com.amazonaws.us-east-1.email-smtp does not support the availability zone of
+        // the subnet: subnet-0ada30b5703616908
         // this.sesVpcEndpointSecurityGroup = new SecurityGroup(this, `ses-vpc-security-group`, {
         //     vpc: this.vpc,
         //     description: `My SES VPC endpoint security group`,

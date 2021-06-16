@@ -8,8 +8,8 @@ import { SecurityGroup } from "@aws-cdk/aws-ec2/lib";
 
 export interface StorageStackProps extends StackProps {
     vpc: Vpc;
-    efsAccessSecurityGroup: SecurityGroup,
-    OAI: OriginAccessIdentity
+    // efsAccessSecurityGroup: SecurityGroup,
+    // OAI: OriginAccessIdentity
 }
 
 export class StorageStack extends cdk.Stack {
@@ -21,8 +21,12 @@ export class StorageStack extends cdk.Stack {
     constructor(scope: cdk.Construct, id: string, props: StorageStackProps) {
         super(scope, id, props);
 
-        this.efsAccessSecurityGroup = props.efsAccessSecurityGroup;
-        this.OAI = props.OAI;
+        this.efsAccessSecurityGroup = new SecurityGroup(this, 'efs-security-group', {
+            vpc: props.vpc,
+            allowAllOutbound: false,
+            securityGroupName: 'EFSSecurityGroup',
+        });
+        this.OAI = new OriginAccessIdentity(this, "OAI");
 
         // EFS Storage
         this.EFSInstance = new FileSystem(this, 'Wordpress_EFS', {
